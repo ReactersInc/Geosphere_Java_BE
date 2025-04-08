@@ -19,21 +19,23 @@ public class RegisterUserEntity {
 
     @Id
     @Nonnull
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "UserId")
-    private  Long userId;
-    @Column(name = "Email")
+    @Column(name = "user_id")
+    private  String userId;
+    @Column(name = "email")
     private String email;
-    @Column(name = "Password")
+    @Column(name = "u_pass")
     private String password;
-    @Column(name = "FirstName")
+    @Column(name = "f_name")
     private String firstName;
-    @Column(name = "LastName")
+    @Column(name = "l_name")
     private String lastName;
-    @Column(name = "DateOfBirth")
-    private LocalDate dateOfBirth;
-    @Column(name = "RegisteredAt")
+//    @Column(name = "DateOfBirth")
+//    private LocalDate dateOfBirth;
+    @Column(name = "created_at")
     private LocalDateTime registeredAt;
-    @Column(name = "Role")
-    private String role;
+//    @Column(name = "Role")
+//    private String role;
+    @Column(name = "photo")
+    private String photo;
+
 }

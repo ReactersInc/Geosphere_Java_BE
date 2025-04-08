@@ -33,9 +33,9 @@ public class LoginUserService {
             RegisterUserEntity user = registerUserRepo.findByEmail(data.getEmail())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            String role = user.getRole().toString(); // assuming it's a String, or use user.getRole().name() if it's enum
+//            String role = user.getRole().toString(); // assuming it's a String, or use user.getRole().name() if it's enum
 
-            String jwt = jwtUtil.generateToken(user.getEmail(), role);
+            String jwt = jwtUtil.generateToken(user.getEmail(), user.getUserId(), user.getFirstName(), user.getLastName());
 
             return jwt;
 
