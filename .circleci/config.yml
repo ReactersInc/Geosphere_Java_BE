@@ -83,7 +83,7 @@ jobs:
                  },
                  {
                    "type": "section",
-                   "text": { "type": "mrkdwn", "text": "*JAVA Geosphere Backend* deployment failed! 🚨 Please check the CircleCI logs." }
+                   "text": { "type": "mrkdwn", "text": "*JAVA-> Geosphere Backend* deployment failed! 🚨 Please check the CircleCI logs." }
                  }
                ]
              }
