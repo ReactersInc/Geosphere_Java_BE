@@ -26,7 +26,7 @@ jobs:
                 },
                 {
                   "type": "section",
-                  "text": { "type": "mrkdwn", "text": "*JAVA Geosphere Backend* deployment has *started*. 🛠️" }
+                  "text": { "type": "mrkdwn", "text": "*JAVA Geosphere Backe nd* deployment has *started*. 🛠️" }
                 }
               ]
             }
