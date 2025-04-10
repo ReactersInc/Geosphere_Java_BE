@@ -18,7 +18,8 @@ public class RegisterUserDTO {
     private String password;
     private String firstName;
     private String lastName;
-    private LocalDate dateOfBirth;
+    private String photo;
+//    private LocalDate dateOfBirth;
 
 }
 

@@ -53,9 +53,12 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String username, String role) {
+    public String generateToken(String username, String userId, String firstName, String lastName) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role",role);
+//        claims.put("role",role);
+        claims.put("userId",userId);
+        claims.put("firstName",firstName);
+        claims.put("lastName", lastName);
         return createToken(claims, username);
     }
 
@@ -66,7 +69,7 @@ public class JwtUtil {
                 .header().empty().add("typ","JWT")
                 .and()
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 5 minutes expiration time
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 )) //  1 Day expiry time
                 .signWith(getSigningKey())
                 .compact();
     }
