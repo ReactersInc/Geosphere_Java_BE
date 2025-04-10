@@ -22,11 +22,11 @@ jobs:
               "blocks": [
                 {
                   "type": "header",
-                  "text": { "type": "plain_text", "text": "🚀 JAVA Deployment Triggered!" }
+                  "text": { "type": "plain_text", "text": "🚀 Deployment Triggered!" }
                 },
                 {
                   "type": "section",
-                  "text": { "type": "mrkdwn", "text": "*JAVA Geosphere Backe nd* deployment has *started*. 🛠️" }
+                  "text": { "type": "mrkdwn", "text": "*Geosphere Backend* deployment has *started*. 🛠️" }
                 }
               ]
             }
@@ -50,8 +50,8 @@ jobs:
 
       # Step 5: Execute Octorewards Deployment Script
       - run:
-          name: Execute Java_GeoSphere Deployment Script
-          command: ssh -vvv -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP ""
+          name: Execute Octorewards Deployment Script
+          command: ssh -vvv -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP "cd /GeoSphere_Backend && sudo sh deploy.sh"
 
       # Notify Slack of job success
       - slack/notify:
@@ -62,11 +62,11 @@ jobs:
               "blocks": [
                 {
                   "type": "header",
-                  "text": { "type": "plain_text", "text": "✅ JAVA Deployment Success" }
+                  "text": { "type": "plain_text", "text": "✅ Deployment Success" }
                 },
                 {
                   "type": "section",
-                  "text": { "type": "mrkdwn", "text": "*JAVA Geosphere Backend* has been deployed successfully! 🎉" }
+                  "text": { "type": "mrkdwn", "text": "*Geosphere Backend* has been deployed successfully! 🎉" }
                 }
               ]
             }
@@ -79,11 +79,11 @@ jobs:
                "blocks": [
                  {
                    "type": "header",
-                   "text": { "type": "plain_text", "text": "❌ JAVA Deployment Failed" }
+                   "text": { "type": "plain_text", "text": "❌ Deployment Failed" }
                  },
                  {
                    "type": "section",
-                   "text": { "type": "mrkdwn", "text": "*JAVA-> Geosphere Backend* deployment failed! 🚨 Please check the CircleCI logs." }
+                   "text": { "type": "mrkdwn", "text": "*Geosphere Backend* deployment failed! 🚨 Please check the CircleCI logs." }
                  }
                ]
              }
