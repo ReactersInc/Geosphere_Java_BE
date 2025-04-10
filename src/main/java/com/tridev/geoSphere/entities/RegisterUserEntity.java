@@ -38,4 +38,10 @@ public class RegisterUserEntity {
     @Column(name = "photo")
     private String photo;
 
+    @Column(name = "otp")
+    private String otp;
+
+    @Column(name = "is_verified")
+    private Boolean isVerified;
+
 }
