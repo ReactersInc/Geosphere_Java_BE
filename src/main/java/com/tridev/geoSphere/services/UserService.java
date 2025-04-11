@@ -40,26 +40,32 @@ private static  final PasswordEncoder passwordEncoder = new BCryptPasswordEncode
 
 
     @Transactional
-    public ResponseEntity<RegisterUserDTO> registerUser(RegisterUserDTO registerUserDTO, String userType){
+    public RegisterUserDTO registerUser(RegisterUserDTO registerUserDTO, String userType) {
         RegisterUserEntity entity = registerUserMapper.toEntity(registerUserDTO);
         entity.setPassword(passwordEncoder.encode(entity.getPassword()));
         entity.setRegisteredAt(LocalDateTime.now());
-        String newUserId= generateCustomUserId();
 
-        log.info("the new userId is {}", newUserId);
+        String newUserId = generateCustomUserId();
+        log.info("The new userId is {}", newUserId);
         entity.setUserId(newUserId);
-        //generate and set OTP
-        String otp= generateOTPUtil.OTP();
+        entity.setIsVerified(false);
+
+        // generate and set OTP
+        String otp = generateOTPUtil.OTP();
         entity.setOtp(otp);
 
-//        entity.setRole(String.valueOf(userType));
-        RegisterUserEntity savedEntity = registerUserRepo.save(entity);
+        registerUserRepo.save(entity); // Save the entity
 
         // send mail
-        emailService.sendEmail(entity.getEmail(), "Verify Email to Register on GeoFence App", "your one time OTP to verify your Email and continue to GeoFencing Application is {}"+ entity.getOtp());
+        emailService.sendEmail(
+                entity.getEmail(),
+                "Verify Email to Register on GeoFence App",
+                "Your OTP to verify your Email is: " + entity.getOtp()
+        );
 
-        return new ResponseEntity<>(registerUserDTO, HttpStatus.CREATED);
+        return registerUserDTO; // Just return the DTO or entity as needed
     }
+
 
 
     private String generateCustomUserId() {
@@ -74,6 +80,9 @@ private static  final PasswordEncoder passwordEncoder = new BCryptPasswordEncode
 
         return "U-" + nextId;
     }
+
+
+
 
 
 //    public ResponseEntity<RegisterUserDTO> updateUser(){
