@@ -33,7 +33,7 @@ public class RegisterUserEntity {
 //    @Column(name = "DateOfBirth")
 //    private LocalDate dateOfBirth;
     @Column(name = "CreatedAt")
-    private LocalDateTime registeredAt;
+    private LocalDateTime createdAt;
     @Column(name = "Role")
     private String role;
     @Column(name = "Photo")
