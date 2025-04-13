@@ -43,7 +43,7 @@ private static  final PasswordEncoder passwordEncoder = new BCryptPasswordEncode
     public RegisterUserDTO registerUser(RegisterUserDTO registerUserDTO, String userType) {
         RegisterUserEntity entity = registerUserMapper.toEntity(registerUserDTO);
         entity.setPassword(passwordEncoder.encode(entity.getPassword()));
-        entity.setRegisteredAt(LocalDateTime.now());
+        entity.setCreatedAt(LocalDateTime.now());
 
 //        String newUserId = generateCustomUserId();
 //        log.info("The new userId is {}", newUserId);
