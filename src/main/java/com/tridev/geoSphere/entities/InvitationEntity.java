@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "Invitation")
-public class InvitationEntity extends BaseEntity {
+public class InvitationEntity {
 
     @Id
     @Nonnull
@@ -29,7 +29,7 @@ public class InvitationEntity extends BaseEntity {
     @Column(name = "UserId", nullable = false)
     private Integer userId;
 
-    @Column(name = "RecipientEmail", nullable = false, length = 255)
+    @Column(name = "RecipientEmail", nullable = false)
     private String recipientEmail;
 
     @Enumerated(EnumType.STRING)

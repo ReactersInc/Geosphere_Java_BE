@@ -2,18 +2,13 @@ package com.tridev.geoSphere.services;
 
 import com.tridev.geoSphere.DTO.LoginDTO;
 import com.tridev.geoSphere.DTO.LoginResponseDTO;
-import com.tridev.geoSphere.entities.RegisterUserEntity;
+import com.tridev.geoSphere.entities.UserEntity;
 import com.tridev.geoSphere.repositories.UserRepo;
 import com.tridev.geoSphere.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class LoginUserService {
@@ -35,7 +30,7 @@ public class LoginUserService {
                     new UsernamePasswordAuthenticationToken(data.getEmail(), data.getPassword())
             );
 
-            RegisterUserEntity user = registerUserRepo.findByEmail(data.getEmail())
+            UserEntity user = registerUserRepo.findByEmail(data.getEmail())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             if (Boolean.TRUE.equals(user.getIsVerified())) {

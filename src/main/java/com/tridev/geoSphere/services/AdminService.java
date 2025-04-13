@@ -1,7 +1,7 @@
 package com.tridev.geoSphere.services;
 
 import com.tridev.geoSphere.DTO.UserDetailsDTO;
-import com.tridev.geoSphere.entities.RegisterUserEntity;
+import com.tridev.geoSphere.entities.UserEntity;
 import com.tridev.geoSphere.mappers.RegisterUserMapper;
 import com.tridev.geoSphere.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class AdminService {
 
     public ResponseEntity<List<UserDetailsDTO>> getAllUsers(){
 
-        List<RegisterUserEntity> all = userRepo.findAll();
+        List<UserEntity> all = userRepo.findAll();
         List<UserDetailsDTO> userDetails = registerUserMapper.toEntities(all);
         return new ResponseEntity<>(userDetails, HttpStatus.OK);
 

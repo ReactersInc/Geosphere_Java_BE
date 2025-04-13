@@ -1,23 +1,18 @@
 package com.tridev.geoSphere.services;
 
 import com.tridev.geoSphere.DTO.RegisterUserDTO;
-import com.tridev.geoSphere.entities.RegisterUserEntity;
+import com.tridev.geoSphere.entities.UserEntity;
 import com.tridev.geoSphere.mappers.RegisterUserMapper;
 import com.tridev.geoSphere.repositories.UserRepo;
 import com.tridev.geoSphere.utils.GenerateOTPUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -41,7 +36,7 @@ private static  final PasswordEncoder passwordEncoder = new BCryptPasswordEncode
 
     @Transactional
     public RegisterUserDTO registerUser(RegisterUserDTO registerUserDTO, String userType) {
-        RegisterUserEntity entity = registerUserMapper.toEntity(registerUserDTO);
+        UserEntity entity = registerUserMapper.toEntity(registerUserDTO);
         entity.setPassword(passwordEncoder.encode(entity.getPassword()));
         entity.setCreatedAt(LocalDateTime.now());
 
