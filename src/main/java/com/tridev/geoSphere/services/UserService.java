@@ -45,10 +45,11 @@ private static  final PasswordEncoder passwordEncoder = new BCryptPasswordEncode
         entity.setPassword(passwordEncoder.encode(entity.getPassword()));
         entity.setRegisteredAt(LocalDateTime.now());
 
-        String newUserId = generateCustomUserId();
-        log.info("The new userId is {}", newUserId);
-        entity.setUserId(newUserId);
+//        String newUserId = generateCustomUserId();
+//        log.info("The new userId is {}", newUserId);
+//        entity.setId(newUserId);
         entity.setIsVerified(false);
+        entity.setRole(userType);
 
         // generate and set OTP
         String otp = generateOTPUtil.OTP();
@@ -68,18 +69,18 @@ private static  final PasswordEncoder passwordEncoder = new BCryptPasswordEncode
 
 
 
-    private String generateCustomUserId() {
-        Optional<RegisterUserEntity> lastUserOpt = registerUserRepo.findTopByOrderByUserIdDesc();
-
-        int nextId = 101;
-        if (lastUserOpt.isPresent()) {
-            String lastId = lastUserOpt.get().getUserId(); // e.g., "U-105"
-            int num = Integer.parseInt(lastId.split("-")[1]);
-            nextId = num + 1;
-        }
-
-        return "U-" + nextId;
-    }
+//    private String generateCustomUserId() {
+//        Optional<RegisterUserEntity> lastUserOpt = registerUserRepo.findTopByOrderByUserIdDesc();
+//
+//        int nextId = 101;
+//        if (lastUserOpt.isPresent()) {
+//            String lastId = lastUserOpt.get().getUserId(); // e.g., "U-105"
+//            int num = Integer.parseInt(lastId.split("-")[1]);
+//            nextId = num + 1;
+//        }
+//
+//        return "U-" + nextId;
+//    }
 
 
 

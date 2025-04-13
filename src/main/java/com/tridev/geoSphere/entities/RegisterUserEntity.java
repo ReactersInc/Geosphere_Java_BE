@@ -14,34 +14,38 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "Users")
 public class RegisterUserEntity {
 
     @Id
     @Nonnull
-    @Column(name = "user_id")
-    private  String userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "Id")
+    private  Integer Id;
     @Column(name = "email")
     private String email;
-    @Column(name = "u_pass")
+    @Column(name = "Password")
     private String password;
-    @Column(name = "f_name")
+    @Column(name = "FirstName")
     private String firstName;
-    @Column(name = "l_name")
+    @Column(name = "LastName")
     private String lastName;
 //    @Column(name = "DateOfBirth")
 //    private LocalDate dateOfBirth;
-    @Column(name = "created_at")
+    @Column(name = "CreatedAt")
     private LocalDateTime registeredAt;
-//    @Column(name = "Role")
-//    private String role;
-    @Column(name = "photo")
+    @Column(name = "Role")
+    private String role;
+    @Column(name = "Photo")
     private String photo;
 
-    @Column(name = "otp")
+    @Column(name = "Otp")
     private String otp;
 
-    @Column(name = "is_verified")
+    @Column(name = "IsVerified")
     private Boolean isVerified;
+
+    @Column(name = "Status")
+    private Integer status;
 
 }

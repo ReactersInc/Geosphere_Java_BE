@@ -41,7 +41,7 @@ public class LoginUserService {
             if (Boolean.TRUE.equals(user.getIsVerified())) {
                 String jwt = jwtUtil.generateToken(
                         user.getEmail(),
-                        user.getUserId(),
+                        user.getId(),
                         user.getFirstName(),
                         user.getLastName()
                 );
