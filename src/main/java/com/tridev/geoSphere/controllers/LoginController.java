@@ -6,10 +6,7 @@ import com.tridev.geoSphere.services.LoginUserService;
 import com.tridev.geoSphere.services.UserServiceDetailsImpl;
 import com.tridev.geoSphere.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/login")
