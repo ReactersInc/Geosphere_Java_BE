@@ -1,12 +1,12 @@
 package com.tridev.geoSphere.services;
 
-import com.tridev.geoSphere.DTO.UserDetailsDTO;
+import com.tridev.geoSphere.dto.UserDetailsDTO;
 import com.tridev.geoSphere.entities.UserEntity;
 import com.tridev.geoSphere.mappers.RegisterUserMapper;
 import com.tridev.geoSphere.repositories.UserRepo;
+import com.tridev.geoSphere.response.BaseResponse;
+import com.tridev.geoSphere.utils.GeosphereServiceUtility;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,11 +20,9 @@ public class AdminService {
     private RegisterUserMapper registerUserMapper;
 
 
-    public ResponseEntity<List<UserDetailsDTO>> getAllUsers(){
-
+    public BaseResponse getAllUsers(){
         List<UserEntity> all = userRepo.findAll();
         List<UserDetailsDTO> userDetails = registerUserMapper.toEntities(all);
-        return new ResponseEntity<>(userDetails, HttpStatus.OK);
-
+        return GeosphereServiceUtility.getBaseResponse(userDetails);
     }
 }

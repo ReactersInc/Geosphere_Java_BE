@@ -1,4 +1,4 @@
-package com.tridev.geoSphere.DTO;
+package com.tridev.geoSphere.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginResponseDTO {
+public class LoginDTO {
 
-    private String token;
+    private String email;
+    private  String password;
+
 }

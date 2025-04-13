@@ -1,10 +1,12 @@
 package com.tridev.geoSphere.services;
 
-import com.tridev.geoSphere.DTO.RegisterUserDTO;
+import com.tridev.geoSphere.dto.RegisterUserDTO;
 import com.tridev.geoSphere.entities.UserEntity;
 import com.tridev.geoSphere.mappers.RegisterUserMapper;
 import com.tridev.geoSphere.repositories.UserRepo;
+import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.utils.GenerateOTPUtil;
+import com.tridev.geoSphere.utils.GeosphereServiceUtility;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -35,32 +37,29 @@ private static  final PasswordEncoder passwordEncoder = new BCryptPasswordEncode
 
 
     @Transactional
-    public RegisterUserDTO registerUser(RegisterUserDTO registerUserDTO, String userType) {
+    public BaseResponse registerUser(RegisterUserDTO registerUserDTO, String userType) {
         UserEntity entity = registerUserMapper.toEntity(registerUserDTO);
         entity.setPassword(passwordEncoder.encode(entity.getPassword()));
         entity.setCreatedAt(LocalDateTime.now());
-
-//        String newUserId = generateCustomUserId();
-//        log.info("The new userId is {}", newUserId);
-//        entity.setId(newUserId);
         entity.setIsVerified(false);
         entity.setRole(userType);
 
-        // generate and set OTP
+        // Generate and set OTP
         String otp = generateOTPUtil.OTP();
         entity.setOtp(otp);
 
-        registerUserRepo.save(entity); // Save the entity
+        registerUserRepo.save(entity);
 
-        // send mail
+        // Send email with OTP
         emailService.sendEmail(
                 entity.getEmail(),
                 "Verify Email to Register on GeoFence App",
-                "Your OTP to verify your Email is: " + entity.getOtp()
+                "Your OTP to verify your Email is: " + otp
         );
 
-        return registerUserDTO; // Just return the DTO or entity as needed
+        return GeosphereServiceUtility.getBaseResponseWithoutData();
     }
+
 
 
 

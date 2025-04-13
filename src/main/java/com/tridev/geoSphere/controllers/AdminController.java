@@ -1,5 +1,6 @@
 package com.tridev.geoSphere.controllers;
 
+import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.services.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ public class AdminController {
     private AdminService adminService;
 
     @GetMapping
-    public ResponseEntity<?> getAllUsers(){
+    public BaseResponse getAllUsers(){
         return adminService.getAllUsers();
     }
 }

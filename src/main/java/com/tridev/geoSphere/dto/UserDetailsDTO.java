@@ -1,4 +1,4 @@
-package com.tridev.geoSphere.DTO;
+package com.tridev.geoSphere.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

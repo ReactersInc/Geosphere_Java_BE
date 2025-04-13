@@ -1,8 +1,8 @@
 package com.tridev.geoSphere.mappers;
 
 
-import com.tridev.geoSphere.DTO.RegisterUserDTO;
-import com.tridev.geoSphere.DTO.UserDetailsDTO;
+import com.tridev.geoSphere.dto.RegisterUserDTO;
+import com.tridev.geoSphere.dto.UserDetailsDTO;
 import com.tridev.geoSphere.entities.UserEntity;
 import org.mapstruct.Mapper;
 
