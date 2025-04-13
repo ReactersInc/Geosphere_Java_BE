@@ -1,13 +1,9 @@
-package com.tridev.geoSphere.DTO;
+package com.tridev.geoSphere.dto;
 
-import jakarta.annotation.Nonnull;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

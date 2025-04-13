@@ -1,13 +1,13 @@
-package com.tridev.geoSphere.DTO;
+package com.tridev.geoSphere.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class VerifyEmailDTO {
+@NoArgsConstructor
+public class ResendOTPDTO {
+
     private String email;
-    private String otp;
 }
