@@ -1,10 +1,10 @@
 package com.tridev.geoSphere.controllers;
 
-import com.tridev.geoSphere.DTO.RegisterUserDTO;
-import com.tridev.geoSphere.DTO.ResendOTPDTO;
-import com.tridev.geoSphere.DTO.VerifyEmailDTO;
-import com.tridev.geoSphere.common.BaseResponse;
+import com.tridev.geoSphere.dto.RegisterUserDTO;
+import com.tridev.geoSphere.dto.ResendOTPDTO;
+import com.tridev.geoSphere.dto.VerifyEmailDTO;
 import com.tridev.geoSphere.enums.UserType;
+import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.services.UserService;
 import com.tridev.geoSphere.services.OTPService;
 import com.tridev.geoSphere.utils.ResponseBuilder;
@@ -31,47 +31,30 @@ public class AuthControllers {
 
 
     @PostMapping("/register-user")
-    public ResponseEntity<BaseResponse> registerUser(@RequestBody RegisterUserDTO registerUserDTO) {
-        RegisterUserDTO registeredUser = registerUserService.registerUser(registerUserDTO, UserType.USER.getDescription());
-
-        return ResponseBuilder.custom(registeredUser, HttpStatus.CREATED, "User registered successfully");
+    public BaseResponse registerUser(@RequestBody RegisterUserDTO registerUserDTO) {
+        return registerUserService.registerUser(registerUserDTO, UserType.USER.getDescription());
     }
+
 
     @PostMapping("/register-admin")
-    public ResponseEntity<BaseResponse> registerAdmin(@RequestBody RegisterUserDTO registerUserDTO) {
-        RegisterUserDTO registeredUser = registerUserService.registerUser(registerUserDTO, UserType.ADMIN.getDescription());
-
-        return ResponseBuilder.custom(registeredUser, HttpStatus.CREATED, "User registered successfully");
+    public BaseResponse registerAdmin(@RequestBody RegisterUserDTO registerUserDTO) {
+        return registerUserService.registerUser(registerUserDTO, UserType.ADMIN.getDescription());
     }
+
 
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<BaseResponse> verifyotp(@RequestBody VerifyEmailDTO verifyEmailDTO) throws Exception {
-
-        Boolean isVerified = verifyOTPService.verifyOtp(verifyEmailDTO);
-
-        if (isVerified){
-            return  ResponseBuilder.custom(true, HttpStatus.OK, "User Sucessfully verified");
-        }else{
-            return ResponseBuilder.custom(false, HttpStatus.BAD_REQUEST, "Failed to verify user verified");
-        }
-
-
+    public BaseResponse verifyOtp(@RequestBody VerifyEmailDTO verifyEmailDTO) throws Exception {
+        return verifyOTPService.verifyOtp(verifyEmailDTO);
     }
+
 
 
     @PostMapping("/resend-otp")
-    public ResponseEntity<BaseResponse> resendOTP(@RequestBody ResendOTPDTO email){
-
-        Boolean isTrue = otpService.resendOtp(email);
-
-        if(isTrue){
-            return ResponseBuilder.custom(true, HttpStatus.OK,"OTP sent Sucessfully");
-        }else{
-            return ResponseBuilder.custom(false, HttpStatus.NOT_FOUND, "User Not found");
-        }
-
+    public BaseResponse resendOTP(@RequestBody ResendOTPDTO email) throws Exception {
+        return otpService.resendOtp(email);
     }
+
 
 
 

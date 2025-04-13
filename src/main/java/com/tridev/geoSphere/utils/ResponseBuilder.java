@@ -1,7 +1,8 @@
 package com.tridev.geoSphere.utils;
 
-import com.tridev.geoSphere.common.BaseResponse;
-import com.tridev.geoSphere.common.Result;
+
+import com.tridev.geoSphere.response.BaseResponse;
+import com.tridev.geoSphere.response.Result;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

@@ -1,9 +1,11 @@
 package com.tridev.geoSphere.services;
 
-import com.tridev.geoSphere.DTO.LoginDTO;
-import com.tridev.geoSphere.DTO.LoginResponseDTO;
+import com.tridev.geoSphere.dto.LoginDTO;
+import com.tridev.geoSphere.dto.LoginResponseDTO;
 import com.tridev.geoSphere.entities.UserEntity;
 import com.tridev.geoSphere.repositories.UserRepo;
+import com.tridev.geoSphere.response.BaseResponse;
+import com.tridev.geoSphere.utils.GeosphereServiceUtility;
 import com.tridev.geoSphere.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +26,7 @@ public class LoginUserService {
     private UserServiceDetailsImpl userServiceDetails;
 
 
-    public LoginResponseDTO loginUser(LoginDTO data) {
+    public BaseResponse loginUser(LoginDTO data) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(data.getEmail(), data.getPassword())
@@ -40,8 +42,9 @@ public class LoginUserService {
                         user.getFirstName(),
                         user.getLastName()
                 );
-
-                return new LoginResponseDTO(jwt);
+                LoginResponseDTO loginResponseDTO= null;
+                loginResponseDTO.setToken(jwt);
+                return GeosphereServiceUtility.getBaseResponse(loginResponseDTO);
             } else {
                 return null; // will be handled in controller
             }
