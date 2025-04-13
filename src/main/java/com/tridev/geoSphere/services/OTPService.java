@@ -2,7 +2,7 @@ package com.tridev.geoSphere.services;
 
 import com.tridev.geoSphere.DTO.ResendOTPDTO;
 import com.tridev.geoSphere.DTO.VerifyEmailDTO;
-import com.tridev.geoSphere.entities.RegisterUserEntity;
+import com.tridev.geoSphere.entities.UserEntity;
 import com.tridev.geoSphere.repositories.UserRepo;
 import com.tridev.geoSphere.utils.GenerateOTPUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +24,10 @@ public class OTPService {
 
 
     public Boolean verifyOtp(VerifyEmailDTO verifyEmailDTO) throws Exception {
-        Optional<RegisterUserEntity> optionalUser = userRepo.findByEmail(verifyEmailDTO.getEmail());
+        Optional<UserEntity> optionalUser = userRepo.findByEmail(verifyEmailDTO.getEmail());
 
         if (optionalUser.isPresent()) {
-            RegisterUserEntity user = optionalUser.get();
+            UserEntity user = optionalUser.get();
             String storedOtp = user.getOtp();
 
             if(storedOtp != null && storedOtp.equals(verifyEmailDTO.getOtp())){
@@ -48,10 +48,10 @@ public class OTPService {
 
     public Boolean resendOtp(ResendOTPDTO resendOTPDTO){
 
-        Optional<RegisterUserEntity> optionalUser = userRepo.findByEmail(resendOTPDTO.getEmail());
+        Optional<UserEntity> optionalUser = userRepo.findByEmail(resendOTPDTO.getEmail());
         if(optionalUser.isPresent()){
 
-            RegisterUserEntity user = optionalUser.get();
+            UserEntity user = optionalUser.get();
             String otp = generateOTPUtil.OTP();
             user.setOtp(otp);
             userRepo.save(user);
