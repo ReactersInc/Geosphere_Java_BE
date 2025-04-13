@@ -1,6 +1,7 @@
 package com.tridev.geoSphere.controllers;
 
 import com.tridev.geoSphere.dto.LoginDTO;
+import com.tridev.geoSphere.dto.LoginResponseDTO;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.services.LoginUserService;
 import com.tridev.geoSphere.services.UserServiceDetailsImpl;
@@ -27,7 +28,7 @@ public class LoginController {
 
 
     @PostMapping
-    public BaseResponse loginUser(@RequestBody LoginDTO data){
+    public BaseResponse loginUser(@RequestBody LoginDTO data)throws Exception{
         return loginUserService.loginUser(data);
     }
 }
