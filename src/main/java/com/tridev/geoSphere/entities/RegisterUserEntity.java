@@ -22,7 +22,7 @@ public class RegisterUserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
     private  Integer Id;
-    @Column(name = "email")
+    @Column(name = "Email")
     private String email;
     @Column(name = "Password")
     private String password;
@@ -33,7 +33,7 @@ public class RegisterUserEntity {
 //    @Column(name = "DateOfBirth")
 //    private LocalDate dateOfBirth;
     @Column(name = "CreatedAt")
-    private LocalDateTime registeredAt;
+    private LocalDateTime createdAt;
     @Column(name = "Role")
     private String role;
     @Column(name = "Photo")
