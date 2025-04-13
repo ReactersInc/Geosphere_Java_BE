@@ -25,6 +25,7 @@ public class CommonValidationConstant {
     public static final String EMPTY_USER_LIST = "Choose at least one user";
     public static final String PUSH_NOTIFICATION_FAILED = "Push notification failed";
     public static final String USER_NOT_FOUND = "User Not found";
+    public static final String USER_NOT_VERIFIED = "User Not Verified";
 
     private CommonValidationConstant() {
     }
