@@ -1,4 +1,4 @@
-package com.tridev.geoSphere.common;
+package com.tridev.geoSphere.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
