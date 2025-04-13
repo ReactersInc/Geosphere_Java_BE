@@ -5,6 +5,7 @@ import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "Geofence")
-public class GeofenceEntity extends BaseEntity{
+public class GeofenceEntity{
 
     @Id
     @Nonnull
@@ -32,4 +33,17 @@ public class GeofenceEntity extends BaseEntity{
 
     @Column(name = "Status")
     private Integer status;
+
+    @Column(name = "CreatedAt")
+    private LocalDateTime createdAt;
+
+    @Column(name = "CreatedBy")
+    private Long createdBy;
+
+    @LastModifiedDate
+    @Column(name = "UpdatedAt")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "UpdatedBy")
+    private Long updatedBy;
 }

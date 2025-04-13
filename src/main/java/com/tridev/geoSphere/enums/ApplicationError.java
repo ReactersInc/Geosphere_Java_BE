@@ -32,7 +32,9 @@ public enum ApplicationError {
     OTP_EXPIRED(100019, CommonValidationConstant.OTP_EXPIRED),
     EMPTY_USER_LIST(100020, CommonValidationConstant.EMPTY_USER_LIST),
     PUSH_NOTIFICATION_FAILED(100021, CommonValidationConstant.PUSH_NOTIFICATION_FAILED),
-    USER_NOT_FOUND(100022,CommonValidationConstant.USER_NOT_FOUND);
+    USER_NOT_FOUND(100022,CommonValidationConstant.USER_NOT_FOUND),
+    USER_NOT_VERIFIED(100023,CommonValidationConstant.USER_NOT_VERIFIED),
+    BAD_REQUEST(100023,CommonValidationConstant.BAD_REQUEST);
     private final int code;
     private final String reason;
     ApplicationError(int code, String reason) {
