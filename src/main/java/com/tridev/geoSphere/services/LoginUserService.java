@@ -7,11 +7,13 @@ import com.tridev.geoSphere.repositories.UserRepo;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.utils.GeosphereServiceUtility;
 import com.tridev.geoSphere.utils.JwtUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class LoginUserService {
 
@@ -35,6 +37,8 @@ public class LoginUserService {
             UserEntity user = registerUserRepo.findByEmail(data.getEmail())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
+            log.info(user.getEmail());
+
             if (Boolean.TRUE.equals(user.getIsVerified())) {
                 String jwt = jwtUtil.generateToken(
                         user.getEmail(),
@@ -44,6 +48,7 @@ public class LoginUserService {
                 );
                 LoginResponseDTO loginResponseDTO= null;
                 loginResponseDTO.setToken(jwt);
+
                 return GeosphereServiceUtility.getBaseResponse(loginResponseDTO);
             } else {
                 return null; // will be handled in controller
