@@ -22,7 +22,7 @@ public class FCMTokenEntity extends BaseEntity {
     private Long id;
 
     @Column(name = "UserId")
-    private Integer userId;
+    private Long userId;
 
     @Column(name = "DeviceType")
     private String deviceType;

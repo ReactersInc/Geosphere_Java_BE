@@ -10,10 +10,15 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface GeofenceRepository extends JpaRepository<GeofenceEntity, Integer> {
+public interface GeofenceRepository extends JpaRepository<GeofenceEntity, Long> {
     Page<GeofenceEntity> findAll(Pageable pageable);
 
-    Page<GeofenceEntity> findByStatus(int value, PageRequest pageable);
-    boolean existsByNameAndCreatedByAndStatusNot(String name, Long createdBy, Integer status);
+    Page<GeofenceEntity> findByStatus(Integer value, PageRequest pageable);
+    boolean existsByNameAndCreatedByAndStatusNot(String name, Long userId, Integer status);
     Optional<GeofenceEntity> findByNameAndCreatedBy(String name, Long createdBy);
+
+
+    Optional<GeofenceEntity> findByIdAndCreatedByAndStatusNot(Long geofenceId, Long userId, Integer status);
+
+
 }

@@ -1,6 +1,7 @@
 package com.tridev.geoSphere.controllers;
 
 import com.tridev.geoSphere.dto.Geofence.GeofenceRequest;
+import com.tridev.geoSphere.dto.Geofence.UpdateGeofenceRequest;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.services.GeofenceService;
 import com.tridev.geoSphere.services.UserServiceDetailsImpl;
@@ -24,27 +25,27 @@ public class GeofenceController {
         return geofenceService.createGeofence(request);
     }
 
-    @PutMapping("/{id}")
-    public BaseResponse updateGeofence(@PathVariable Integer id, @RequestBody GeofenceRequest request) throws Exception  {
-        return geofenceService.updateGeofence(id, request);
+    @PutMapping()
+    public BaseResponse updateGeofence( @RequestBody UpdateGeofenceRequest updateGeofenceRequest) throws Exception  {
+        return geofenceService.updateGeofence(updateGeofenceRequest);
     }
-
-    @DeleteMapping("/{id}")
-    public BaseResponse deleteGeofence(@PathVariable Integer id) throws Exception  {
-        return geofenceService.deleteGeofence(id);
-    }
-
-    @GetMapping("/{id}")
-    public BaseResponse getGeofenceById(@PathVariable Integer id) throws Exception {
-        return geofenceService.getGeofenceById(id);
-    }
-
-    @GetMapping
-    public BaseResponse getAllGeofences(
-            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
-            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
-            @RequestParam(name = "sortOrder", defaultValue = "DESC") String sortOrder) throws Exception  {
-
-        return geofenceService.getAllGeofences(pageNo, pageSize, sortOrder);
-    }
+//
+//    @DeleteMapping("/{id}")
+//    public BaseResponse deleteGeofence(@PathVariable Long id) throws Exception  {
+//        return geofenceService.deleteGeofence(id);
+//    }
+//
+//    @GetMapping("/{id}")
+//    public BaseResponse getGeofenceById(@PathVariable Long id) throws Exception {
+//        return geofenceService.getGeofenceById(id);
+//    }
+//
+//    @GetMapping
+//    public BaseResponse getAllGeofences(
+//            @RequestParam(name = "pageNo", defaultValue = "0") int pageNo,
+//            @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
+//            @RequestParam(name = "sortOrder", defaultValue = "DESC") String sortOrder) throws Exception  {
+//
+//        return geofenceService.getAllGeofences(pageNo, pageSize, sortOrder);
+//    }
 }
