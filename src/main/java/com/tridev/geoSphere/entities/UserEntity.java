@@ -19,7 +19,7 @@ public class UserEntity {
     @Nonnull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
-    private  Integer Id;
+    private  Long Id;
     @Column(name = "Email")
     private String email;
     @Column(name = "Password")

@@ -8,23 +8,27 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "Geofence")
-public class GeofenceEntity{
+public class GeofenceEntity extends  BaseEntity{
 
     @Id
     @Nonnull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
-    private Integer id;
+    private Long id;
 
     @Nonnull
     @Column(name = "Name", nullable = false)
     private String name;
+
+    @Column(name = "Description")
+    private String description;
 
     @Nonnull
     @Lob
@@ -34,16 +38,13 @@ public class GeofenceEntity{
     @Column(name = "Status")
     private Integer status;
 
-    @Column(name = "CreatedAt")
-    private LocalDateTime createdAt;
+    @Column(name = "EnableNotifications")
+    private Boolean enableNotifications;
 
-    @Column(name = "CreatedBy")
-    private Long createdBy;
+    @Column(name = "Colors")
+    private String colors;
 
-    @LastModifiedDate
-    @Column(name = "UpdatedAt")
-    private LocalDateTime updatedAt;
+    @Column(name = "AlertCount")
+    private Integer alertCount;
 
-    @Column(name = "UpdatedBy")
-    private Long updatedBy;
 }

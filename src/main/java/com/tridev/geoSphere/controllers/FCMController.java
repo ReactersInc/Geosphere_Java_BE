@@ -23,7 +23,5 @@ public class FCMController {
 
         return  fcmTokenService.storeToken(storeTokenDTO);
 
-
-
     }
 }

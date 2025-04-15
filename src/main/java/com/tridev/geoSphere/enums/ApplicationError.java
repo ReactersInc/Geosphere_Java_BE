@@ -34,7 +34,9 @@ public enum ApplicationError {
     PUSH_NOTIFICATION_FAILED(100021, CommonValidationConstant.PUSH_NOTIFICATION_FAILED),
     USER_NOT_FOUND(100022,CommonValidationConstant.USER_NOT_FOUND),
     USER_NOT_VERIFIED(100023,CommonValidationConstant.USER_NOT_VERIFIED),
-    BAD_REQUEST(100023,CommonValidationConstant.BAD_REQUEST);
+    BAD_REQUEST(100023,CommonValidationConstant.BAD_REQUEST),
+    GEOFENCE_NOT_FOUND(100024,CommonValidationConstant.GEOFENCE_NOT_FOUND),
+    GEOFENCE_ALREADY_EXIST(100025, CommonValidationConstant.GEOFENCE_ALREADY_EXIST );
     private final int code;
     private final String reason;
     ApplicationError(int code, String reason) {

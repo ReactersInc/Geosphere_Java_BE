@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StoreTokenDTO {
 
-    private Integer userId;
+
 
     private String deviceType;
 

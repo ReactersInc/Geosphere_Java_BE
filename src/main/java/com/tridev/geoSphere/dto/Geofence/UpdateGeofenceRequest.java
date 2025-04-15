@@ -6,7 +6,8 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class GeofenceRequest {
+public class UpdateGeofenceRequest {
+    private Long geofenceId;
     private String name;
     private String description;
     private List<Coordinates> coordinates;
