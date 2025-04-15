@@ -5,6 +5,7 @@ import com.tridev.geoSphere.constant.CommonValidationConstant;
 import com.tridev.geoSphere.dto.LoginDTO;
 import com.tridev.geoSphere.dto.LoginResponseDTO;
 import com.tridev.geoSphere.entities.UserEntity;
+import com.tridev.geoSphere.enums.Status;
 import com.tridev.geoSphere.exceptions.BadRequestException;
 import com.tridev.geoSphere.repositories.UserRepo;
 import com.tridev.geoSphere.response.BaseResponse;
@@ -30,13 +31,15 @@ public class LoginUserService {
     private UserServiceDetailsImpl userServiceDetails;
 
 
+
+
     public BaseResponse loginUser(LoginDTO data) throws Exception {
         log.info("login user");
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(data.getEmail(), data.getPassword())
             );
-            UserEntity user = registerUserRepo.findByEmail(data.getEmail())
+            UserEntity user = registerUserRepo.findByEmailAndStatus(data.getEmail(), Status.ACTIVE.getValue())
                     .orElseThrow(() -> new RuntimeException("User not found"));
             log.info("user:{}", user);
 
