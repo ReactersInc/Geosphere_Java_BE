@@ -2,6 +2,7 @@ package com.tridev.geoSphere.services;
 
 import com.tridev.geoSphere.dto.RegisterUserDTO;
 import com.tridev.geoSphere.entities.UserEntity;
+import com.tridev.geoSphere.enums.Status;
 import com.tridev.geoSphere.mappers.RegisterUserMapper;
 import com.tridev.geoSphere.repositories.UserRepo;
 import com.tridev.geoSphere.response.BaseResponse;
@@ -47,6 +48,7 @@ private static  final PasswordEncoder passwordEncoder = new BCryptPasswordEncode
         // Generate and set OTP
         String otp = generateOTPUtil.OTP();
         entity.setOtp(otp);
+        entity.setStatus(Status.PENDING.getValue());
 
         registerUserRepo.save(entity);
 

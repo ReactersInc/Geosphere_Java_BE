@@ -38,7 +38,7 @@ public class SpringSecurity {
                         .requestMatchers("/auth/**", "/login/**").permitAll()
                         .requestMatchers("/app/**").authenticated()
                         .requestMatchers("/admin/**").authenticated()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)

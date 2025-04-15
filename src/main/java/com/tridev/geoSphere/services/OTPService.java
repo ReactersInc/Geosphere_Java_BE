@@ -4,6 +4,7 @@ import com.tridev.geoSphere.constant.CommonValidationConstant;
 import com.tridev.geoSphere.dto.ResendOTPDTO;
 import com.tridev.geoSphere.dto.VerifyEmailDTO;
 import com.tridev.geoSphere.entities.UserEntity;
+import com.tridev.geoSphere.enums.Status;
 import com.tridev.geoSphere.exceptions.BadRequestException;
 import com.tridev.geoSphere.repositories.UserRepo;
 import com.tridev.geoSphere.response.BaseResponse;
@@ -28,7 +29,7 @@ public class OTPService {
 
 
     public BaseResponse verifyOtp(VerifyEmailDTO verifyEmailDTO) throws Exception {
-        Optional<UserEntity> optionalUser = userRepo.findByEmail(verifyEmailDTO.getEmail());
+        Optional<UserEntity> optionalUser = userRepo.findByEmailAndStatus(verifyEmailDTO.getEmail(), Status.ACTIVE.getValue());
 
         if (optionalUser.isPresent()) {
             UserEntity user = optionalUser.get();
@@ -36,6 +37,7 @@ public class OTPService {
 
             if (storedOtp != null && storedOtp.equals(verifyEmailDTO.getOtp())) {
                 user.setIsVerified(true);
+                user.setStatus(Status.ACTIVE.getValue());
                 userRepo.save(user);
                 return GeosphereServiceUtility.getBaseResponseWithoutData();
             } else {
@@ -50,7 +52,7 @@ public class OTPService {
 
 
     public BaseResponse resendOtp(ResendOTPDTO resendOTPDTO) throws Exception{
-        Optional<UserEntity> optionalUser = userRepo.findByEmail(resendOTPDTO.getEmail());
+        Optional<UserEntity> optionalUser = userRepo.findByEmailAndStatus(resendOTPDTO.getEmail(), Status.ACTIVE.getValue());
         if (optionalUser.isPresent()) {
             UserEntity user = optionalUser.get();
             String otp = generateOTPUtil.OTP();

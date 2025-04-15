@@ -1,6 +1,7 @@
 package com.tridev.geoSphere.mappers;
 
 
+import com.tridev.geoSphere.dto.Profile.ProfileDTO;
 import com.tridev.geoSphere.dto.RegisterUserDTO;
 import com.tridev.geoSphere.dto.UserDetailsDTO;
 import com.tridev.geoSphere.entities.UserEntity;
@@ -19,6 +20,9 @@ UserEntity toEntity(RegisterUserDTO registerUserDTO);
 
 
 List<UserDetailsDTO> toEntities(List<UserEntity> registerUserEntity);
+
+
+ProfileDTO toProfile(UserEntity userEntity);
 
 
 }

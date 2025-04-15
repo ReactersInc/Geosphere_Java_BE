@@ -1,6 +1,7 @@
 package com.tridev.geoSphere.services;
 
 import com.tridev.geoSphere.entities.UserEntity;
+import com.tridev.geoSphere.enums.Status;
 import com.tridev.geoSphere.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +17,7 @@ public class UserServiceDetailsImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserEntity user = registerUserRepo.findByEmail(email)
+        UserEntity user = registerUserRepo.findByEmailAndStatus(email, Status.ACTIVE.getValue())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
         return org.springframework.security.core.userdetails.User.builder()
@@ -25,4 +26,8 @@ public class UserServiceDetailsImpl implements UserDetailsService {
 //                .roles(String.valueOf(user.getRole())) // or use authorities if needed
                 .build();
     }
+
+
+
+
 }
