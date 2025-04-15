@@ -47,7 +47,7 @@ public class GeofenceService {
                 request.getName(),
                 userId,
                 Status.DELETED.getValue())) {
-            throw new BadRequestException("Geofence with this name already exists");
+            throw new BadRequestException(CommonValidationConstant.GEOFENCE_ALREADY_EXIST);
         }
 
         GeofenceEntity entity = new GeofenceEntity();
