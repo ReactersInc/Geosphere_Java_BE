@@ -28,7 +28,7 @@ public class SpringSecurity {
 
 
     @Autowired
-    private JwtFilter jwtFilter;
+    private JwtFilter  jwtFilter;
 
 
     @Bean
