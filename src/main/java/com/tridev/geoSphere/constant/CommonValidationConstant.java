@@ -29,6 +29,7 @@ public class CommonValidationConstant {
     public static final String BAD_REQUEST = "Bad Request";
     public static final String GEOFENCE_NOT_FOUND ="Geofence Not Found" ;
     public static final String GEOFENCE_ALREADY_EXIST = "Geofence already exist with this name";
+    public static final String INVALID_CREDENTIALS = "InCorrect Credentials";
 
     private CommonValidationConstant() {
     }
