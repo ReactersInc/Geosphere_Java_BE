@@ -36,7 +36,8 @@ public enum ApplicationError {
     USER_NOT_VERIFIED(100023,CommonValidationConstant.USER_NOT_VERIFIED),
     BAD_REQUEST(100023,CommonValidationConstant.BAD_REQUEST),
     GEOFENCE_NOT_FOUND(100024,CommonValidationConstant.GEOFENCE_NOT_FOUND),
-    GEOFENCE_ALREADY_EXIST(100025, CommonValidationConstant.GEOFENCE_ALREADY_EXIST );
+    GEOFENCE_ALREADY_EXIST(100025, CommonValidationConstant.GEOFENCE_ALREADY_EXIST ),
+    INCORRECT_CREDENTIALS(100026, CommonValidationConstant.INVALID_CREDENTIALS );
     private final int code;
     private final String reason;
     ApplicationError(int code, String reason) {

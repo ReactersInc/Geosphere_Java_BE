@@ -75,14 +75,16 @@ public class GlobalExceptionHandler {
     
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BadRequestException.class)
-    public Result handleBadRequestException(BadRequestException ex, WebRequest request) {
+    public BaseResponse handleBadRequestException(BadRequestException ex, WebRequest request) {
         log.error("handleBadRequestException {} ", ex);
         Result result = new Result();
         String responseDescription = ex.getMessage();
         ApplicationError code = ApplicationError.getApplicationErrorByReason(responseDescription);
         result.setResponseCode(code.getCode());
         result.setResponseDescription(responseDescription);
-        return result;
+        BaseResponse baseResponse = new BaseResponse();
+        baseResponse.setResult(result);
+        return baseResponse;
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -242,12 +244,14 @@ public class GlobalExceptionHandler {
     }
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(RuntimeException.class)
-    protected Result handleRuntimeException(RuntimeException ex) {
+    protected BaseResponse handleRuntimeException(RuntimeException ex) {
         log.error("handleRuntimeException {} ", ex);
         Result result = new Result();
         result.setResponseCode(10000);
         result.setResponseDescription("Runtime Exception : Please connect with IT Team");
-        return result;
+        BaseResponse baseResponse = new BaseResponse();
+        baseResponse.setResult(result);
+        return baseResponse;
     }
 
 
