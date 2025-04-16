@@ -1,7 +1,9 @@
 package com.tridev.geoSphere.services;
 
+import com.tridev.geoSphere.constant.CommonValidationConstant;
 import com.tridev.geoSphere.entities.UserEntity;
 import com.tridev.geoSphere.enums.Status;
+import com.tridev.geoSphere.exceptions.BadRequestException;
 import com.tridev.geoSphere.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,14 +19,19 @@ public class UserServiceDetailsImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserEntity user = registerUserRepo.findByEmailAndStatus(email, Status.ACTIVE.getValue())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+        try {
+        UserEntity user = null;
+            user = registerUserRepo.findByEmailAndStatus(email, Status.ACTIVE.getValue())
+                    .orElseThrow(() -> new BadRequestException(CommonValidationConstant.USER_NOT_FOUND));
 
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword())
 //                .roles(String.valueOf(user.getRole())) // or use authorities if needed
                 .build();
+        } catch (BadRequestException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
