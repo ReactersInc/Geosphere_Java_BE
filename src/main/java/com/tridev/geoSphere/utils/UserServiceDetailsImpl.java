@@ -1,4 +1,4 @@
-package com.tridev.geoSphere.services;
+package com.tridev.geoSphere.utils;
 
 import com.tridev.geoSphere.constant.CommonValidationConstant;
 import com.tridev.geoSphere.entities.UserEntity;
@@ -27,7 +27,7 @@ public class UserServiceDetailsImpl implements UserDetailsService {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword())
-//                .roles(String.valueOf(user.getRole())) // or use authorities if needed
+                .roles(String.valueOf(user.getRole())) // or use authorities if needed
                 .build();
         } catch (BadRequestException e) {
             throw new RuntimeException(e);

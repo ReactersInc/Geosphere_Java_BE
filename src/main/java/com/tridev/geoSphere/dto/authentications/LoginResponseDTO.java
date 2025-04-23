@@ -1,4 +1,4 @@
-package com.tridev.geoSphere.dto;
+package com.tridev.geoSphere.dto.authentications;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

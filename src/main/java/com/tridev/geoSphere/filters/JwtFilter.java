@@ -1,12 +1,18 @@
 package com.tridev.geoSphere.filters;
 
-import com.tridev.geoSphere.services.UserServiceDetailsImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tridev.geoSphere.dto.common.ErrorResponse;
+
+import com.tridev.geoSphere.utils.UserServiceDetailsImpl;
 import com.tridev.geoSphere.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,55 +20,156 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.security.sasl.AuthenticationException;
 import java.io.IOException;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 
+@Slf4j
 @Component
-public class JwtFilter  extends OncePerRequestFilter {
-    @Autowired
-    private UserServiceDetailsImpl userServiceDetails;
+@RequiredArgsConstructor
+public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private static final List<String> EXCLUDED_PATHS = Arrays.asList(
+            "/auth",
+            "/login",
+            "/actuator/health",
+            "/v3/api-docs/",
+            "/swagger-ui/",
+            "/swagger-ui.html",
+            "/error"
+    );
+
+    private final UserServiceDetailsImpl userServiceDetails;
+    private final JwtUtil jwtUtil;
+    private final ObjectMapper objectMapper;
+
 
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        String authorizationHeader = request.getHeader("Authorization");
-        String username = null;
-        String jwt = null;
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws IOException {
 
-        if(authorizationHeader == null){
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized request");
-            return;
-        }
+        log.info("the uri is {}", request.getRequestURI());
+
 
         try {
-            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-                jwt = authorizationHeader.substring(7);
-                username = jwtUtil.extractUsername(jwt);
+            if (shouldNotFilter(request)) {
+                filterChain.doFilter(request, response);
+                return;
             }
+
+            String authorizationHeader = request.getHeader("Authorization");
+
+
+            log.info("the auth is {}", authorizationHeader);
+
+            if (authorizationHeader == null) {
+                throw new JwtAuthenticationException(HttpStatus.UNAUTHORIZED,
+                        "Authorization header missing - Please provide a Bearer token");
+            }
+
+            if (!authorizationHeader.startsWith("Bearer ")) {
+                throw new JwtAuthenticationException(HttpStatus.UNAUTHORIZED,
+                        "Invalid Authorization header format - Expected 'Bearer <token>'");
+            }
+
+
+
+            validateAuthorizationHeader(authorizationHeader);
+
+
+            String jwt = authorizationHeader.substring(7);
+            String username = jwtUtil.extractUsername(jwt);
+
+            log.info("username is {}", username);
+
+            log.info("security context {}", SecurityContextHolder.getContext().getAuthentication());
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userServiceDetails.loadUserByUsername(username);
-
-                if (jwtUtil.validateToken(jwt)) {
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                            userDetails, jwt, userDetails.getAuthorities());
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                } else {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired JWT token");
-                    return;
-                }
+                authenticateUser(request, jwt, username);
             }
-        } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token has expired");
-            return;
-        } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized request");
-            return;
+
+            filterChain.doFilter(request, response);
+        } catch (AuthenticationException ex) {
+            SecurityContextHolder.clearContext();
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Unexpected error during JWT authentication", ex);
+            SecurityContextHolder.clearContext();
+            throw new AuthenticationServiceException("Internal server error", ex);
+        }
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return EXCLUDED_PATHS.stream().anyMatch(path ->
+                request.getRequestURI().contains(path) ||
+                        request.getRequestURI().equals(path.replace("/", "")));
+    }
+
+    private void validateAuthorizationHeader(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new JwtAuthenticationException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Authorization header with Bearer token required"
+            );
+        }
+    }
+
+    private void authenticateUser(HttpServletRequest request, String jwt, String username) {
+        UserDetails userDetails = userServiceDetails.loadUserByUsername(username);
+
+        if (jwtUtil.validateToken(jwt)) {
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            jwt,
+                            userDetails.getAuthorities()
+                    );
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.info("Authenticated user: {}", username);
+            log.info("Authenticated Context: {}", SecurityContextHolder.getContext().getAuthentication());
+
+        } else {
+            throw new JwtAuthenticationException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Invalid or expired JWT token"
+            );
+        }
+    }
+
+    private void sendErrorResponse(HttpServletResponse response,
+                                   HttpStatus status,
+                                   String message) throws IOException {
+        ErrorResponse errorResponse = new ErrorResponse(
+                Instant.now().toString(),
+                status.value(),
+                status.getReasonPhrase(),
+                message,
+                ""
+        );
+
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(status.value());
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+    }
+
+    private static class JwtAuthenticationException extends RuntimeException {
+        private final HttpStatus status;
+
+        public JwtAuthenticationException(HttpStatus status, String message) {
+            super(message);
+            this.status = status;
         }
 
-        chain.doFilter(request, response);
+        public HttpStatus getStatus() {
+            return status;
+        }
     }
 }

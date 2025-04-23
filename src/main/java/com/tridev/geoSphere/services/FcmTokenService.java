@@ -53,6 +53,7 @@ public class FcmTokenService {
             entity.setToken(storeTokenDTO.getToken());
             entity.setUpdatedAt(LocalDateTime.now());
             entity.setUpdatedBy(userId);
+            entity.setIsLoggedIn(true);
             fcmTokenRepository.save(entity);
             log.info("fcm entity: {}", entity);
         } else {
@@ -66,6 +67,7 @@ public class FcmTokenService {
                 FCMTokenEntity newEntity = fcmTokenMapper.toEntity(storeTokenDTO);
                 newEntity.setUserId(userId);
                 newEntity.setCreatedBy(userId);
+                newEntity.setIsLoggedIn(true);
                 newEntity.setUpdatedAt(LocalDateTime.now());
                 fcmTokenRepository.save(newEntity);
             } else {
@@ -74,6 +76,7 @@ public class FcmTokenService {
                 FCMTokenEntity newEntity = fcmTokenMapper.toEntity(storeTokenDTO);
                 newEntity.setUserId(userId);
                 newEntity.setCreatedBy(userId);
+                newEntity.setIsLoggedIn(true);
 
                 fcmTokenRepository.save(newEntity);
             }

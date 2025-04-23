@@ -1,6 +1,7 @@
 package com.tridev.geoSphere.entities;
 
 import com.tridev.geoSphere.enums.InvitationStatus;
+import com.tridev.geoSphere.enums.NotificationStatus;
 import com.tridev.geoSphere.enums.ResponseStatus;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
@@ -14,8 +15,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Invitation")
-public class InvitationEntity {
+@Table(name = "GeofenceRequest")
+public class GeofenceRequestEntity extends BaseEntity {
 
     @Id
     @Nonnull
@@ -24,34 +25,25 @@ public class InvitationEntity {
     private Long id;
 
     @Column(name = "GeofenceId", nullable = false)
-    private Integer geofenceId;
+    private Long geofenceId;
 
     @Column(name = "UserId", nullable = false)
-    private Integer userId;
+    private Long userId;
 
     @Column(name = "RecipientEmail", nullable = false)
     private String recipientEmail;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "Status")
-    private InvitationStatus status = InvitationStatus.PENDING;
+    private InvitationStatus status = InvitationStatus.ACTIVE;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "ResponseStatus")
     private ResponseStatus responseStatus = ResponseStatus.PENDING;
 
-    @Column(name = "CreatedAt")
-    private LocalDateTime createdAt;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "NotificationStatus")
+    private NotificationStatus notificationStatus = NotificationStatus.PENDING;
 
-    @Column(name = "SentAt")
-    private LocalDateTime sentAt;
 
-    @Column(name = "UpdatedAt")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "CreatedBy")
-    private Integer createdBy;
-
-    @Column(name = "UpdatedBy")
-    private Integer updatedBy;
 }
