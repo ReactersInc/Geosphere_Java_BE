@@ -46,4 +46,7 @@ public class UserEntity {
     @Column(name = "Status")
     private Integer status;
 
+    @Column(name = "PublicProfile", nullable = false )
+    private Boolean publicProfile;
+
 }

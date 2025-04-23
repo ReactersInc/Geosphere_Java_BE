@@ -19,15 +19,15 @@ public class UserGeofenceEntity extends BaseEntity {
     @Nonnull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
-    private Integer id;
+    private Long id;
 
     @Nonnull
     @Column(name = "UserId", nullable = false)
-    private Integer userId;
+    private Long userId;
 
     @Nonnull
     @Column(name = "GeofenceId", nullable = false)
-    private Integer geofenceId;
+    private Long geofenceId;
 
     @Column(name = "Status", columnDefinition = "INT DEFAULT 1")
     private Integer status;

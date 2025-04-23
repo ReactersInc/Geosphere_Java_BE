@@ -1,10 +1,9 @@
 package com.tridev.geoSphere.controllers;
 
-import com.tridev.geoSphere.dto.LoginDTO;
-import com.tridev.geoSphere.dto.LoginResponseDTO;
+import com.tridev.geoSphere.dto.authentications.LoginDTO;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.services.LoginUserService;
-import com.tridev.geoSphere.services.UserServiceDetailsImpl;
+import com.tridev.geoSphere.utils.UserServiceDetailsImpl;
 import com.tridev.geoSphere.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -2,9 +2,9 @@ package com.tridev.geoSphere.enums;
 
 public enum InvitationStatus {
 
-    PENDING("Pending"),
-    SUCCESS("Success"),
-    FAILED("Failed");
+    ACTIVE("Active"),
+    DELETED("Deleted"),
+    INACTIVE("Inactive");
 
     private final String value;
 

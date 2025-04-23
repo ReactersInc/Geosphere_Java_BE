@@ -30,6 +30,17 @@ public class CommonValidationConstant {
     public static final String GEOFENCE_NOT_FOUND ="Geofence Not Found" ;
     public static final String GEOFENCE_ALREADY_EXIST = "Geofence already exist with this name";
     public static final String INVALID_CREDENTIALS = "InCorrect Credentials";
+    public static final String SOMETHING_WENT_WRONG = "Something ent wrong";
+    public static final String NAME_CANNOT_BE_EMPTY = "Geofence name cannot be empty";
+    public static final String COORDINATE_CANNOT_BE_EMPTY = "Coordinates cannot be empty";
+    public static final String PERSON_ALREADY_EXISTS = "This Person Already Exists";
+    public static final String CONTENT_NOT_FOUND = "No Related Content Found";
+    public static final String CONNECTION_REQUEST_ALREADY_EXISTS = "Connection request already exists";
+    public static final String CONNECTION_REQUEST_NOT_FOUND = "Connection request not found";
+    public static final String NO_CONTACTS_FOUND = "No contacts found for user";
+    public static final String REQUEST_NOT_FOUND = "Request not found";
+    public static final String EMAIL_NOT_SENT = "Unable to send email";
+    public static final String REQUEST_ALREADY_SENT = "Request already sent";
 
     private CommonValidationConstant() {
     }

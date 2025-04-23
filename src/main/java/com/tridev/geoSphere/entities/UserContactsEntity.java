@@ -22,11 +22,11 @@ public class UserContactsEntity extends BaseEntity{
 
     @Nonnull
     @Column(name = "UserId", nullable = false)
-    private Integer userId;
+    private Long userId;
 
     @Nonnull
     @Column(name = "ContactUserId", nullable = false)
-    private Integer contactUserId;
+    private Long contactUserId;
 
     @Column(name = "Status")
     private Integer status;

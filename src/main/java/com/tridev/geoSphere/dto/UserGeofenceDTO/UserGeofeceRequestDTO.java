@@ -1,13 +1,15 @@
-package com.tridev.geoSphere.dto;
+package com.tridev.geoSphere.dto.UserGeofenceDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class VerifyEmailDTO {
+@NoArgsConstructor
+public class UserGeofeceRequestDTO {
     private String email;
-    private String otp;
+    private Long geofenceId;
+
+
 }

@@ -4,15 +4,12 @@ import com.tridev.geoSphere.constant.CommonValidationConstant;
 import com.tridev.geoSphere.dto.Profile.ProfileDTO;
 import com.tridev.geoSphere.entities.UserEntity;
 import com.tridev.geoSphere.exceptions.BadRequestException;
-import com.tridev.geoSphere.mappers.RegisterUserMapper;
+import com.tridev.geoSphere.mappers.UserMapper;
 import com.tridev.geoSphere.repositories.UserRepo;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.utils.GeosphereServiceUtility;
 import com.tridev.geoSphere.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -26,7 +23,7 @@ public class ProfileService {
     private UserRepo userRepo;
 
     @Autowired
-    private RegisterUserMapper registerUserMapper;
+    private UserMapper registerUserMapper;
 
 
     @Autowired
