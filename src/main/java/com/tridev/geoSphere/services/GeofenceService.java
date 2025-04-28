@@ -3,30 +3,32 @@ package com.tridev.geoSphere.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tridev.geoSphere.constant.CommonValidationConstant;
 import com.tridev.geoSphere.dto.Geofence.*;
-import com.tridev.geoSphere.entities.GeofenceEntity;
+import com.tridev.geoSphere.dto.common.PaginatedResponse;
+import com.tridev.geoSphere.entities.sql.GeofenceEntity;
 import com.tridev.geoSphere.enums.Status;
 import com.tridev.geoSphere.exceptions.BadRequestException;
+import com.tridev.geoSphere.exceptions.InternalServerErrorException;
 import com.tridev.geoSphere.exceptions.ResourceNotFoundException;
 import com.tridev.geoSphere.mappers.GeofenceMapper;
-import com.tridev.geoSphere.repositories.GeofenceRepository;
+import com.tridev.geoSphere.repositories.sql.GeofenceRepository;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.utils.GeosphereServiceUtility;
 import com.tridev.geoSphere.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GeofenceService {
 
     private final GeofenceRepository geofenceRepository;
@@ -36,7 +38,8 @@ public class GeofenceService {
 
     @Transactional
     public BaseResponse createGeofence(GeofenceRequest request) throws Exception {
-//        validateGeofenceRequest(request);
+        validateGeofenceRequest(request);
+
 
         Long userId = jwtUtil.getUserIdFromToken();
 
@@ -70,57 +73,25 @@ public class GeofenceService {
         return GeosphereServiceUtility.getBaseResponse(geofenceMapper.entityToResponse(savedEntity));
     }
 
-//    public BaseResponse updateGeofence(Long id, GeofenceRequest request) throws Exception {
-//        GeofenceEntity entity = geofenceRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("Geofence not found with id: " + id));
+
+
+    public BaseResponse deleteGeofence(Long id) {
+        GeofenceEntity entity = geofenceRepository.findByIdAndStatus(id, Status.ACTIVE.getValue())
+                .orElseThrow(() -> new ResourceNotFoundException(CommonValidationConstant.GEOFENCE_NOT_FOUND));
+
+        // Soft delete by updating status
+        entity.setStatus(Status.DELETED.getValue());
+        geofenceRepository.save(entity);
+
+        return GeosphereServiceUtility.getBaseResponseWithoutData();
+    }
 //
-//        // Check if geofence is deleted
-//        if (entity.getStatus() == Status.DELETED.getValue()) {
-//            throw new BadRequestException("Cannot update a deleted geofence");
-//        }
-//
-//        validateGeofenceRequest(request);
-//
-//        // Check if another geofence with the new name already exists (excluding current one)
-//        Optional<GeofenceEntity> existingGeofence = geofenceRepository.findByNameAndCreatedBy(
-//                request.getName(),
-//                entity.getCreatedBy());
-//
-//        if (existingGeofence.isPresent() && !existingGeofence.get().getId().equals(id)) {
-//            throw new BadRequestException("Geofence with this name already exists");
-//        }
-//
-//        entity.setName(request.getName());
-//        entity.setCoordinates(request.getCoordinates());
-//
-//        // Only update status if provided in request, otherwise keep existing
-//        if (request.getStatus() != null) {
-//            entity.setStatus(request.getStatus());
-//        }
-//
-//        entity.setUpdatedAt(LocalDateTime.now());
-//
-//        GeofenceEntity updatedEntity = geofenceRepository.save(entity);
-//        return GeosphereServiceUtility.getBaseResponse(geofenceMapper.entityToResponse(updatedEntity));
-//    }
-//
-//    public BaseResponse deleteGeofence(Long id) {
-//        GeofenceEntity entity = geofenceRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("Geofence not found with id: " + id));
-//
-//        // Soft delete by updating status
-//        entity.setStatus(Status.DELETED.getValue());
-//        geofenceRepository.save(entity);
-//
-//        return GeosphereServiceUtility.getBaseResponseWithoutData();
-//    }
-//
-//    public BaseResponse getGeofenceById(Long id) {
-//        GeofenceEntity entity = geofenceRepository.findById(id)
-//                .orElseThrow(() -> new ResourceNotFoundException("Geofence not found with id: " + id));
-//
-//        return GeosphereServiceUtility.getBaseResponse(geofenceMapper.entityToResponse(entity));
-//    }
+    public BaseResponse getGeofenceById(Long id) {
+        GeofenceEntity entity = geofenceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(CommonValidationConstant.GEOFENCE_NOT_FOUND));
+
+        return GeosphereServiceUtility.getBaseResponse(geofenceMapper.entityToResponse(entity));
+    }
 //
 //    public BaseResponse getAllGeofences(int pageNo, int pageSize, String sortOrder) throws Exception{
 //        validatePaginationParams(pageNo, pageSize);
@@ -148,14 +119,14 @@ public class GeofenceService {
 //    }
 //
 //
-//    private void validateGeofenceRequest(GeofenceRequest request)  throws Exception{
-//        if (request.getName() == null || request.getName().trim().isEmpty()) {
-//            throw new BadRequestException("Geofence name cannot be empty");
-//        }
-//        if (request.getCoordinates() == null || request.getCoordinates().trim().isEmpty()) {
-//            throw new BadRequestException("Coordinates cannot be empty");
-//        }
-//    }
+    private void validateGeofenceRequest(GeofenceRequest request)  throws Exception{
+        if (request.getName() == null || request.getName().trim().isEmpty()) {
+            throw new BadRequestException(CommonValidationConstant.NAME_CANNOT_BE_EMPTY);
+        }
+        if (request.getCoordinates() == null || request.getCoordinates().isEmpty()) {
+            throw new BadRequestException(CommonValidationConstant.COORDINATE_CANNOT_BE_EMPTY);
+        }
+    }
 //
 //    private void validatePaginationParams(int pageNo, int pageSize) throws Exception {
 //        if (pageNo < 0) {
@@ -170,6 +141,7 @@ public class GeofenceService {
     @Transactional
     public BaseResponse updateGeofence( UpdateGeofenceRequest updateGeofenceRequest) throws Exception {
         Long userId = jwtUtil.getUserIdFromToken();
+
 
         GeofenceEntity entity = geofenceRepository.findByIdAndCreatedByAndStatusNot(
                         updateGeofenceRequest.getGeofenceId(),
@@ -191,6 +163,83 @@ public class GeofenceService {
 
         GeofenceEntity updatedEntity = geofenceRepository.save(entity);
         return GeosphereServiceUtility.getBaseResponse(geofenceMapper.entityToResponse(updatedEntity));
+    }
+
+
+    public BaseResponse getGeofencesByUser(int page, int size) throws Exception {
+        try {
+
+
+            Long userId = jwtUtil.getUserIdFromToken();
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+            Page<GeofenceEntity> geofencePage = geofenceRepository.findByCreatedByAndStatusNot(
+                    userId,
+                    Status.DELETED.getValue(),
+                    pageable
+            );
+
+            if (geofencePage.isEmpty()) {
+                throw new ResourceNotFoundException(CommonValidationConstant.GEOFENCE_NOT_FOUND);
+            }
+
+            List<GeofenceResponse> responseList = geofencePage.getContent().stream()
+                    .map(geofenceMapper::entityToResponse)
+                    .collect(Collectors.toList());
+
+            PaginatedResponse<GeofenceResponse> paginatedResponse = new PaginatedResponse<>();
+            paginatedResponse.setList(responseList);
+            paginatedResponse.setPage(geofencePage.getNumber());
+            paginatedResponse.setSize(geofencePage.getSize());
+            paginatedResponse.setTotalElements(geofencePage.getTotalElements());
+            paginatedResponse.setTotalPages(geofencePage.getTotalPages());
+
+            return GeosphereServiceUtility.getBaseResponse(paginatedResponse);
+
+        } catch (ResourceNotFoundException ex) {
+            log.warn("Geofences not found: {}", ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            log.error("Error fetching geofences for user", ex);
+            throw new InternalServerErrorException(CommonValidationConstant.SOMETHING_WENT_WRONG);
+        }
+    }
+
+
+
+    @Transactional
+    public BaseResponse toggleGeofenceNotifications(Long geofenceId) throws Exception {
+        Long userId = jwtUtil.getUserIdFromToken();
+
+        GeofenceEntity geofence = geofenceRepository.findByIdAndCreatedByAndStatusNot(
+                        geofenceId,
+                        userId,
+                        Status.DELETED.getValue())
+                .orElseThrow(() -> new BadRequestException(CommonValidationConstant.GEOFENCE_NOT_FOUND));
+
+        geofence.setEnableNotifications(!geofence.getEnableNotifications());
+
+        GeofenceEntity updatedGeofence = geofenceRepository.save(geofence);
+        return GeosphereServiceUtility.getBaseResponse(
+                geofenceMapper.entityToResponse(updatedGeofence));
+    }
+
+
+    @Transactional
+    public BaseResponse toggleGeofenceStatus(Long geofenceId) throws  Exception {
+        Long userId = jwtUtil.getUserIdFromToken();
+
+        GeofenceEntity geofence = geofenceRepository.findByIdAndCreatedByAndStatusNot(geofenceId, userId, Status.DELETED.getValue())
+                .orElseThrow(() -> new ResourceNotFoundException(CommonValidationConstant.GEOFENCE_NOT_FOUND));
+
+        Integer newStatus = geofence.getStatus().equals(Status.ACTIVE.getValue())
+                ? Status.INACTIVE.getValue()
+                : Status.ACTIVE.getValue();
+        geofence.setStatus(newStatus);
+
+        GeofenceEntity updatedGeofence = geofenceRepository.save(geofence);
+        return GeosphereServiceUtility.getBaseResponse(
+                geofenceMapper.entityToResponse(updatedGeofence));
     }
 
 }

@@ -37,7 +37,18 @@ public enum ApplicationError {
     BAD_REQUEST(100023,CommonValidationConstant.BAD_REQUEST),
     GEOFENCE_NOT_FOUND(100024,CommonValidationConstant.GEOFENCE_NOT_FOUND),
     GEOFENCE_ALREADY_EXIST(100025, CommonValidationConstant.GEOFENCE_ALREADY_EXIST ),
-    INCORRECT_CREDENTIALS(100026, CommonValidationConstant.INVALID_CREDENTIALS );
+    INCORRECT_CREDENTIALS(100026, CommonValidationConstant.INVALID_CREDENTIALS ),
+    SOMETHING_WENT_WRONG(100027, CommonValidationConstant.SOMETHING_WENT_WRONG ),
+    NAME_CANNOT_BE_EMPTY(100028, CommonValidationConstant.NAME_CANNOT_BE_EMPTY),
+    COORDINATE_CANNOT_BE_EMPTY(100029, CommonValidationConstant.COORDINATE_CANNOT_BE_EMPTY),
+    PERSON_ALREADY_EXISTS(100030, CommonValidationConstant.PERSON_ALREADY_EXISTS),
+    CONTENT_NOT_FOUND(100031, CommonValidationConstant.CONTENT_NOT_FOUND),
+    CONNECTION_REQUEST_ALREADY_EXISTS(100032, CommonValidationConstant.CONNECTION_REQUEST_ALREADY_EXISTS),
+    CONNECTION_REQUEST_NOT_FOUND(100033, CommonValidationConstant.CONNECTION_REQUEST_NOT_FOUND),
+    NO_CONTACTS_FOUND(100034, CommonValidationConstant.NO_CONTACTS_FOUND),
+    REQUEST_NOT_FOUND(100035, CommonValidationConstant.REQUEST_NOT_FOUND),
+    EMAIL_NOT_SENT(100036, CommonValidationConstant.EMAIL_NOT_SENT),
+    REQUEST_ALREADY_SENT(100037, CommonValidationConstant.REQUEST_ALREADY_SENT);
     private final int code;
     private final String reason;
     ApplicationError(int code, String reason) {

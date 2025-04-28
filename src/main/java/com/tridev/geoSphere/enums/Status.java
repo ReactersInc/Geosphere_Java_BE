@@ -13,7 +13,9 @@ public enum Status {
     INITIATED(8),
     ACCEPTED(11),
     DEACTIVATED(14),
-    DELETED(15),;
+    DELETED(15),
+    REJECTED(16),
+    CANCELED(17);
 
     private final int value;
 

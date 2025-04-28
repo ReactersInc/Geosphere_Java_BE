@@ -1,16 +1,13 @@
 package com.tridev.geoSphere.controllers;
 
-import com.tridev.geoSphere.dto.RegisterUserDTO;
-import com.tridev.geoSphere.dto.ResendOTPDTO;
-import com.tridev.geoSphere.dto.VerifyEmailDTO;
+import com.tridev.geoSphere.dto.authentications.RegisterUserDTO;
+import com.tridev.geoSphere.dto.authentications.ResendOTPDTO;
+import com.tridev.geoSphere.dto.authentications.VerifyEmailDTO;
 import com.tridev.geoSphere.enums.UserType;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.services.UserService;
 import com.tridev.geoSphere.services.OTPService;
-import com.tridev.geoSphere.utils.ResponseBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
