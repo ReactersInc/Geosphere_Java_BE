@@ -14,7 +14,7 @@ public class EmailService {
         private JavaMailSender javaMailSender;
 
 
-        public void sendEmail(String sentTo, String subject, String body){
+        public Boolean sendEmail(String sentTo, String subject, String body){
             try{
 
                 SimpleMailMessage mail = new SimpleMailMessage();
@@ -24,9 +24,13 @@ public class EmailService {
 //            mail.setFrom("${spring.mail.username}");
                 javaMailSender.send(mail);
 
+                return true;
+
 
             }catch (Exception e){
                 log.error("Exception in sending the mail", e);
+
+                return false;
 
             }
         }

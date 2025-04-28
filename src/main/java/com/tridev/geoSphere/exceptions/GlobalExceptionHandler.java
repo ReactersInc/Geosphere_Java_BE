@@ -3,16 +3,20 @@ package com.tridev.geoSphere.exceptions;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.tridev.geoSphere.constant.CommonValidationConstant;
 import com.tridev.geoSphere.config.ValidationFailureException;
+import com.tridev.geoSphere.dto.common.ErrorResponse;
 import com.tridev.geoSphere.enums.ApplicationError;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.response.ErrorBaseResponse;
 import com.tridev.geoSphere.response.InputKeyError;
 import com.tridev.geoSphere.response.Result;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -22,12 +26,18 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.NoHandlerFoundException;
+
+import java.time.Instant;
 
 
 @RestControllerAdvice
 @Slf4j
 @Component("globalException")
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+
 	
 	@ExceptionHandler(ResourceNotFoundException.class)
     @SuppressWarnings("java:S2259")
@@ -43,8 +53,28 @@ public class GlobalExceptionHandler {
         baseResponse.setResult(result);
         return new ResponseEntity<>(baseResponse, HttpStatus.NOT_FOUND);
     }
-	
-	@ExceptionHandler(MethodArgumentNotValidException.class)
+
+
+    @ExceptionHandler(AuthenticationServiceException.class)
+    public ResponseEntity<BaseResponse> internalServerErrorExceptionHandler(
+            AuthenticationServiceException ex, WebRequest request
+    ) {
+        log.error("AuthenticationServiceException: {}", ex.getMessage(), ex);
+
+        BaseResponse baseResponse = new BaseResponse();
+        Result result = new Result();
+
+        result.setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        result.setResponseDescription("An unexpected error occurred. Please try again later.");
+
+        baseResponse.setResult(result);
+        baseResponse.setData(null); // No data in error responses
+
+        return new ResponseEntity<>(baseResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse> handleMethodArgsNotValidException(
             MethodArgumentNotValidException ex, WebRequest request) {
         log.error("MethodArgumentNotValidException {} ", ex);
@@ -265,6 +295,24 @@ public class GlobalExceptionHandler {
         result.setResponseDescription(ex.getErrorDescription());
         return new ResponseEntity<>(result,HttpStatus.BAD_REQUEST);
     }
+
+
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(NoHandlerFoundException ex, HttpServletRequest request) {
+        ErrorResponse error = new ErrorResponse(
+                Instant.now().toString(),
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                "No handler found for " + request.getMethod() + " " + request.getRequestURI(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+
+
+
 
 
 
