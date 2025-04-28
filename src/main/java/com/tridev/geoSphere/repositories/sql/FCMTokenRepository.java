@@ -1,6 +1,6 @@
-package com.tridev.geoSphere.repositories;
+package com.tridev.geoSphere.repositories.sql;
 
-import com.tridev.geoSphere.entities.FCMTokenEntity;
+import com.tridev.geoSphere.entities.sql.FCMTokenEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

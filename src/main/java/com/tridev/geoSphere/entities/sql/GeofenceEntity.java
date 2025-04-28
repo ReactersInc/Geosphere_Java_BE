@@ -1,21 +1,17 @@
-package com.tridev.geoSphere.entities;
+package com.tridev.geoSphere.entities.sql;
 
 import jakarta.persistence.*;
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.LastModifiedDate;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "Geofence")
-public class GeofenceEntity extends  BaseEntity{
+public class GeofenceEntity extends BaseEntity {
 
     @Id
     @Nonnull

@@ -2,8 +2,8 @@ package com.tridev.geoSphere.mappers;
 
 import com.tridev.geoSphere.dto.userContacts.UserContactsRequestDTO;
 import com.tridev.geoSphere.dto.userContacts.UserContactsResponseDTO;
-import com.tridev.geoSphere.entities.UserContactsEntity;
-import com.tridev.geoSphere.entities.UserEntity;
+import com.tridev.geoSphere.entities.sql.UserContactsEntity;
+import com.tridev.geoSphere.entities.sql.UserEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

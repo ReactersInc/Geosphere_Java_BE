@@ -2,11 +2,8 @@ package com.tridev.geoSphere.mappers;
 
 import com.tridev.geoSphere.dto.connectionRequest.ConnectionRequestDTO;
 import com.tridev.geoSphere.dto.connectionRequest.ConnectionResponseDTO;
-import com.tridev.geoSphere.entities.ConnectionRequestEntity;
+import com.tridev.geoSphere.entities.sql.ConnectionRequestEntity;
 import org.mapstruct.Mapper;
-
-import java.util.List;
-import java.util.Optional;
 
 @Mapper(componentModel = "spring")
 public interface ConnectionRequestMapper {

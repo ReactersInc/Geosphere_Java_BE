@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tridev.geoSphere.constant.CommonValidationConstant;
 import com.tridev.geoSphere.dto.Geofence.*;
 import com.tridev.geoSphere.dto.common.PaginatedResponse;
-import com.tridev.geoSphere.entities.GeofenceEntity;
+import com.tridev.geoSphere.entities.sql.GeofenceEntity;
 import com.tridev.geoSphere.enums.Status;
 import com.tridev.geoSphere.exceptions.BadRequestException;
 import com.tridev.geoSphere.exceptions.InternalServerErrorException;
 import com.tridev.geoSphere.exceptions.ResourceNotFoundException;
 import com.tridev.geoSphere.mappers.GeofenceMapper;
-import com.tridev.geoSphere.repositories.GeofenceRepository;
+import com.tridev.geoSphere.repositories.sql.GeofenceRepository;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.utils.GeosphereServiceUtility;
 import com.tridev.geoSphere.utils.JwtUtil;
@@ -20,17 +20,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

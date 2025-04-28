@@ -1,9 +1,9 @@
 package com.tridev.geoSphere.services;
 
 import com.tridev.geoSphere.dto.User.UserDetailsDTO;
-import com.tridev.geoSphere.entities.UserEntity;
+import com.tridev.geoSphere.entities.sql.UserEntity;
 import com.tridev.geoSphere.mappers.UserMapper;
-import com.tridev.geoSphere.repositories.UserRepo;
+import com.tridev.geoSphere.repositories.sql.UserRepo;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.utils.GeosphereServiceUtility;
 import org.springframework.beans.factory.annotation.Autowired;

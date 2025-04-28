@@ -1,7 +1,7 @@
-package com.tridev.geoSphere.repositories;
+package com.tridev.geoSphere.repositories.sql;
 
 import com.tridev.geoSphere.dto.connectionRequest.ConnectionResponseDTO;
-import com.tridev.geoSphere.entities.ConnectionRequestEntity;
+import com.tridev.geoSphere.entities.sql.ConnectionRequestEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

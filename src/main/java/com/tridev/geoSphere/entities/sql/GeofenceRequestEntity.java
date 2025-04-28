@@ -1,4 +1,4 @@
-package com.tridev.geoSphere.entities;
+package com.tridev.geoSphere.entities.sql;
 
 import com.tridev.geoSphere.enums.InvitationStatus;
 import com.tridev.geoSphere.enums.NotificationStatus;
@@ -8,8 +8,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor

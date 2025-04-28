@@ -1,18 +1,14 @@
 package com.tridev.geoSphere.services;
 
 import com.tridev.geoSphere.dto.FCMToken.StoreTokenDTO;
-import com.tridev.geoSphere.entities.FCMTokenEntity;
-import com.tridev.geoSphere.entities.UserEntity;
+import com.tridev.geoSphere.entities.sql.FCMTokenEntity;
 import com.tridev.geoSphere.mappers.FCMTokenMapper;
-import com.tridev.geoSphere.repositories.FCMTokenRepository;
-import com.tridev.geoSphere.repositories.UserRepo;
+import com.tridev.geoSphere.repositories.sql.FCMTokenRepository;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.utils.GeosphereServiceUtility;
 import com.tridev.geoSphere.utils.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

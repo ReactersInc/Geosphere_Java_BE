@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tridev.geoSphere.dto.Geofence.Coordinates;
 import com.tridev.geoSphere.dto.Geofence.GeofenceResponse;
-import com.tridev.geoSphere.entities.GeofenceEntity;
+import com.tridev.geoSphere.entities.sql.GeofenceEntity;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,6 +1,6 @@
-package com.tridev.geoSphere.repositories;
+package com.tridev.geoSphere.repositories.sql;
 
-import com.tridev.geoSphere.entities.GeofenceRequestEntity;
+import com.tridev.geoSphere.entities.sql.GeofenceRequestEntity;
 import com.tridev.geoSphere.enums.InvitationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 

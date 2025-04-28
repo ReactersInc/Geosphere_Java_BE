@@ -5,10 +5,10 @@ import com.tridev.geoSphere.dto.GeofenceRequest.GeofenceRequestDTO;
 import com.tridev.geoSphere.dto.UserGeofenceDTO.UserGeofeceRequestDTO;
 import com.tridev.geoSphere.dto.UserGeofenceDTO.UserGeofeceResponseDTO;
 import com.tridev.geoSphere.dto.common.PaginatedResponse;
-import com.tridev.geoSphere.entities.GeofenceEntity;
-import com.tridev.geoSphere.entities.GeofenceRequestEntity;
-import com.tridev.geoSphere.entities.UserEntity;
-import com.tridev.geoSphere.entities.UserGeofenceEntity;
+import com.tridev.geoSphere.entities.sql.GeofenceEntity;
+import com.tridev.geoSphere.entities.sql.GeofenceRequestEntity;
+import com.tridev.geoSphere.entities.sql.UserEntity;
+import com.tridev.geoSphere.entities.sql.UserGeofenceEntity;
 import com.tridev.geoSphere.enums.InvitationStatus;
 import com.tridev.geoSphere.enums.NotificationStatus;
 import com.tridev.geoSphere.enums.ResponseStatus;
@@ -17,10 +17,10 @@ import com.tridev.geoSphere.exceptions.BadRequestException;
 import com.tridev.geoSphere.exceptions.ResourceNotFoundException;
 import com.tridev.geoSphere.mappers.GeofenceRequestMapper;
 import com.tridev.geoSphere.mappers.UserGeofenceMapper;
-import com.tridev.geoSphere.repositories.GeofenceRepository;
-import com.tridev.geoSphere.repositories.GeofenceRequestRepository;
-import com.tridev.geoSphere.repositories.UserGeofenceRepo;
-import com.tridev.geoSphere.repositories.UserRepo;
+import com.tridev.geoSphere.repositories.sql.GeofenceRepository;
+import com.tridev.geoSphere.repositories.sql.GeofenceRequestRepository;
+import com.tridev.geoSphere.repositories.sql.UserGeofenceRepository;
+import com.tridev.geoSphere.repositories.sql.UserRepo;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.utils.GeosphereServiceUtility;
 import com.tridev.geoSphere.utils.JwtUtil;
@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 public class UserGeofenceService {
 
     @Autowired
-    private UserGeofenceRepo userGeofenceRepo;
+    private UserGeofenceRepository userGeofenceRepo;
 
     @Autowired
     private JwtUtil jwtUtil;

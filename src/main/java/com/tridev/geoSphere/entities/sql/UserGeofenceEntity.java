@@ -1,12 +1,10 @@
-package com.tridev.geoSphere.entities;
+package com.tridev.geoSphere.entities.sql;
 
 import jakarta.persistence.*;
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -31,4 +29,13 @@ public class UserGeofenceEntity extends BaseEntity {
 
     @Column(name = "Status", columnDefinition = "INT DEFAULT 1")
     private Integer status;
+
+    @Column(name = "IsCurrentlyInside", columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private Boolean isCurrentlyInside = true;
+
+    @Column(name = "LastEnteredAt")
+    private Long lastEnteredAt;
+
+    @Column(name = "LastExitedAt")
+    private Long lastExitedAt;
 }

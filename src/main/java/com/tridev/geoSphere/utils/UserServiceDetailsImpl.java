@@ -1,10 +1,10 @@
 package com.tridev.geoSphere.utils;
 
 import com.tridev.geoSphere.constant.CommonValidationConstant;
-import com.tridev.geoSphere.entities.UserEntity;
+import com.tridev.geoSphere.entities.sql.UserEntity;
 import com.tridev.geoSphere.enums.Status;
 import com.tridev.geoSphere.exceptions.BadRequestException;
-import com.tridev.geoSphere.repositories.UserRepo;
+import com.tridev.geoSphere.repositories.sql.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

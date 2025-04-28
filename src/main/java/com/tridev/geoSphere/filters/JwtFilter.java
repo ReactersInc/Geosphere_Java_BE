@@ -38,7 +38,9 @@ public class JwtFilter extends OncePerRequestFilter {
             "/v3/api-docs/",
             "/swagger-ui/",
             "/swagger-ui.html",
-            "/error"
+            "/error",
+            "/ws",
+            "/ws/**"
     );
 
     private final UserServiceDetailsImpl userServiceDetails;
