@@ -1,4 +1,4 @@
-package com.tridev.geoSphere.entities;
+package com.tridev.geoSphere.entities.sql;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
@@ -6,14 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "UserContacts")
-public class UserContactsEntity extends BaseEntity{
+public class UserContactsEntity extends BaseEntity {
     @Id
     @Nonnull
     @GeneratedValue(strategy = GenerationType.IDENTITY)

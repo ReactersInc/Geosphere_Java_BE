@@ -1,18 +1,14 @@
 package com.tridev.geoSphere.services;
 
-import com.tridev.geoSphere.constant.CommonValidationConstant;
-import com.tridev.geoSphere.dto.Geofence.GeofenceResponse;
-import com.tridev.geoSphere.dto.User.ConnectionStatusDTO;
 import com.tridev.geoSphere.dto.User.PublicProfileResponseDTO;
 import com.tridev.geoSphere.dto.authentications.RegisterUserDTO;
 import com.tridev.geoSphere.dto.common.PaginatedResponse;
-import com.tridev.geoSphere.entities.ConnectionRequestEntity;
-import com.tridev.geoSphere.entities.UserEntity;
+import com.tridev.geoSphere.entities.sql.ConnectionRequestEntity;
+import com.tridev.geoSphere.entities.sql.UserEntity;
 import com.tridev.geoSphere.enums.Status;
-import com.tridev.geoSphere.exceptions.ResourceNotFoundException;
 import com.tridev.geoSphere.mappers.UserMapper;
-import com.tridev.geoSphere.repositories.ConnectionRequestRepository;
-import com.tridev.geoSphere.repositories.UserRepo;
+import com.tridev.geoSphere.repositories.sql.ConnectionRequestRepository;
+import com.tridev.geoSphere.repositories.sql.UserRepo;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.utils.GenerateOTPUtil;
 import com.tridev.geoSphere.utils.GeosphereServiceUtility;

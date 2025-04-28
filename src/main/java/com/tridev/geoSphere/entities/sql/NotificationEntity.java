@@ -1,4 +1,4 @@
-package com.tridev.geoSphere.entities;
+package com.tridev.geoSphere.entities.sql;
 
 import com.tridev.geoSphere.enums.NotificationStatus;
 import jakarta.annotation.Nonnull;

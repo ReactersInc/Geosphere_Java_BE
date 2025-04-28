@@ -1,7 +1,7 @@
-package com.tridev.geoSphere.repositories;
+package com.tridev.geoSphere.repositories.sql;
 
-import com.tridev.geoSphere.entities.UserEntity;
-import com.tridev.geoSphere.entities.UserGeofenceEntity;
+import com.tridev.geoSphere.entities.sql.UserEntity;
+import com.tridev.geoSphere.entities.sql.UserGeofenceEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,10 +9,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserGeofenceRepo extends JpaRepository<UserGeofenceEntity, Long> {
+public interface UserGeofenceRepository extends JpaRepository<UserGeofenceEntity, Long> {
 
 
 //    Optional<UserGeofenceEntity> getByUserIdAndGeoFenceIdAndStatusNot(Long userId, Long geofenceId, Integer status);
@@ -28,6 +29,13 @@ public interface UserGeofenceRepo extends JpaRepository<UserGeofenceEntity, Long
                     "WHERE ug.GeofenceId = :geofenceId AND ug.Status = 1 AND u.Status = 1",
             nativeQuery = true)
     Page<UserEntity> findUsersByGeofenceId(@Param("geofenceId") Long geofenceId, Pageable pageable);
+
+
+    List<UserGeofenceEntity> findByUserId(Long userId);
+
+    List<UserGeofenceEntity> findByGeofenceId(Long geofenceId);
+
+    Optional<UserGeofenceEntity> findByUserIdAndGeofenceId(Long userId, Long geofenceId);
 
 
 

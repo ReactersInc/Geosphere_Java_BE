@@ -5,9 +5,8 @@ import com.tridev.geoSphere.dto.Profile.ProfileDTO;
 import com.tridev.geoSphere.dto.User.PublicProfileResponseDTO;
 import com.tridev.geoSphere.dto.authentications.RegisterUserDTO;
 import com.tridev.geoSphere.dto.User.UserDetailsDTO;
-import com.tridev.geoSphere.entities.UserEntity;
+import com.tridev.geoSphere.entities.sql.UserEntity;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import java.util.List;
 import java.util.stream.Collectors;

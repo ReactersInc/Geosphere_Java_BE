@@ -1,7 +1,7 @@
 package com.tridev.geoSphere.mappers;
 
 import com.tridev.geoSphere.dto.FCMToken.StoreTokenDTO;
-import com.tridev.geoSphere.entities.FCMTokenEntity;
+import com.tridev.geoSphere.entities.sql.FCMTokenEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

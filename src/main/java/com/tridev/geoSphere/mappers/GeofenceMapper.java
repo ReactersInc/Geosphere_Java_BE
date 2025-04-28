@@ -1,7 +1,7 @@
 package com.tridev.geoSphere.mappers;
 
 import com.tridev.geoSphere.dto.Geofence.GeofenceResponse;
-import com.tridev.geoSphere.entities.GeofenceEntity;
+import com.tridev.geoSphere.entities.sql.GeofenceEntity;
 import com.tridev.geoSphere.utils.GeofenceConversionUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
