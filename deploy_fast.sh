@@ -1,5 +1,4 @@
 #!/bin/bash
-
 echo "=== Starting SSH Agent and Adding Key ==="
 eval "$(ssh-agent -s)"
 ssh-add /root/.ssh/geosphere.pem
@@ -47,5 +46,11 @@ else
   exit 1
 fi
 
+echo "=== Running Tests (if any) ==="
+if command -v mvn &> /dev/null; then
+  mvn test || echo "⚠️ Tests failed or not found"
+else
+  echo "⚠️ Maven not found. Skipping tests."
+fi
 
 echo "✅ Deployment Complete"
