@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd /GeoSphere_Java_BE || { echo "❌ Failed to cd into /GeoSphere_Java_BE"; exit 1; }
-
 echo "=== Starting SSH Agent and Adding Key ==="
 eval "$(ssh-agent -s)"
 ssh-add /root/.ssh/geosphere.pem
