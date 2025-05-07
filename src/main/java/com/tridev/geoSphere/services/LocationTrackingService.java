@@ -1,12 +1,15 @@
 package com.tridev.geoSphere.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tridev.geoSphere.constant.CommonValidationConstant;
 import com.tridev.geoSphere.dto.location.LocationUpdateRequest;
 import com.tridev.geoSphere.entities.mongo.UserLocation;
 import com.tridev.geoSphere.entities.sql.GeofenceEntity;
 import com.tridev.geoSphere.entities.sql.UserGeofenceEntity;
 import com.tridev.geoSphere.entities.mongo.GeoPoint;
 
+import com.tridev.geoSphere.exceptions.BadRequestException;
 import com.tridev.geoSphere.repositories.mongo.UserLocationRepository;
 import com.tridev.geoSphere.repositories.sql.GeofenceRepository;
 import com.tridev.geoSphere.repositories.sql.UserGeofenceRepository;
@@ -22,6 +25,9 @@ import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,14 +49,17 @@ public class LocationTrackingService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private GeoFenceLocationService geoFenceLocationService;
+
     private final WebSocketService webSocketService;
 
 
-
-    public BaseResponse updateUserLocation(LocationUpdateRequest request) {
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+    public BaseResponse updateUserLocation(LocationUpdateRequest request) throws BadRequestException {
         Long userId = jwtUtil.getUserIdFromToken();
         // Get previous location to check for significant movement
-        Optional<UserLocation> previousLocationOpt = userLocationRepository.findTopByUserIdOrderByTimestampDesc(userId);
+        //Optional<UserLocation> previousLocationOpt = userLocationRepository.findTopByUserIdOrderByTimestampDesc(userId);
 
 
         // Create new location entry
@@ -64,46 +73,47 @@ public class LocationTrackingService {
 
 
         // Check if movement is significant (>5 meters)
-        boolean isSignificantMovement = true;
-        if (previousLocationOpt.isPresent()) {
-            UserLocation prevLocation = previousLocationOpt.get();
-            double distance = calculateDistance(
-                    prevLocation.getLocation().getLatitude(),
-                    prevLocation.getLocation().getLongitude(),
-                    request.getLatitude(), request.getLongitude()
-            );
-
-            isSignificantMovement = distance >= 5.0;
-        }
-
-
+//        boolean isSignificantMovement = true;
+//        if (previousLocationOpt.isPresent()) {
+//            UserLocation prevLocation = previousLocationOpt.get();
+//            double distance = calculateDistance(
+//                    prevLocation.getLocation().getLatitude(),
+//                    prevLocation.getLocation().getLongitude(),
+//                    request.getLatitude(), request.getLongitude()
+//            );
+//
+//            isSignificantMovement = distance >= 5.0;
+//        }
 
 
-        // Only save if it's a significant movement
-        if (isSignificantMovement) {
+
+
+
+
             UserLocation savedLocation = userLocationRepository.save(newLocation);
 
             // Check geofence boundaries
-            checkGeofenceStatus(userId, request.getLatitude(), request.getLongitude());
+            geoFenceLocationService.checkGeofenceStatus(userId, request.getLatitude(), request.getLongitude());
 
             webSocketService.broadcastUserLocation(savedLocation);
 
             return GeosphereServiceUtility.getBaseResponse(savedLocation);
-        } else {
 
-            return GeosphereServiceUtility.getBaseResponse(previousLocationOpt.orElse(newLocation));
-        }
     }
 
-    public void checkGeofenceStatus(Long userId, double latitude, double longitude) {
+    public void checkGeofenceStatus(Long userId, double latitude, double longitude) throws BadRequestException {
         // Get all geofences this user is part of
         List<UserGeofenceEntity> userGeofences = userGeofenceRepository.findByUserId(userId);
 
-        Point userPoint = geometryFactory.createPoint(new Coordinate(longitude, latitude));
-
-        for (UserGeofenceEntity userGeofence : userGeofences) {
-            GeofenceEntity geofence = geofenceRepository.findById(userGeofence.getGeofenceId())
-                    .orElseThrow(() -> new RuntimeException("Geofence not found"));
+        Point userPoint = geometryFactory.createPoint(new Coordinate(latitude,longitude ));
+        userGeofences.parallelStream().forEach(userGeofence->{
+            GeofenceEntity geofence = null;
+            try {
+                geofence = geofenceRepository.findById(userGeofence.getGeofenceId())
+                        .orElseThrow(() -> new BadRequestException(CommonValidationConstant.GEOFENCE_NOT_FOUND));
+            } catch (BadRequestException e) {
+                throw new RuntimeException(e);
+            }
 
             boolean isInside = isPointInGeofence(userPoint, geofence.getCoordinates());
 
@@ -127,26 +137,32 @@ public class LocationTrackingService {
                 notificationService.sendGeofenceEntryNotification(
                         geofence.getCreatedBy(), userId, geofence.getId(), geofence.getName());
             }
-        }
+        });
     }
 
     private boolean isPointInGeofence(Point point, String geofenceCoordinates) {
         try {
-            // Parse the geofence coordinates from GeoJSON format
-            Map<String, Object> geoJson = objectMapper.readValue(geofenceCoordinates, Map.class);
-            List<List<List<Double>>> coordinates = (List<List<List<Double>>>) geoJson.get("coordinates");
+            // Parse your custom format: [{"lat":..., "lang":...}]
+            List<Map<String, Double>> coordList = objectMapper.readValue(
+                    geofenceCoordinates,
+                    new TypeReference<List<Map<String, Double>>>() {}
+            );
 
-            // Create polygon from coordinates
-            Polygon polygon = createPolygonFromCoordinates(coordinates.get(0));
+            // Convert to Coordinate array (latitude, longitude) to match userPoint
+            Coordinate[] coordinates = new Coordinate[coordList.size() + 1]; // +1 to close polygon
+            for (int i = 0; i < coordList.size(); i++) {
+                Map<String, Double> coord = coordList.get(i);
+                coordinates[i] = new Coordinate(coord.get("lat"), coord.get("lang")); // lat, lng
+            }
+            coordinates[coordList.size()] = coordinates[0].copy(); // Close the polygon
 
-            // Check if point is within polygon
+            Polygon polygon = geometryFactory.createPolygon(coordinates);
             return polygon.contains(point);
         } catch (Exception e) {
             log.error("Error checking if point is in geofence", e);
             return false;
         }
     }
-
     private Polygon createPolygonFromCoordinates(List<List<Double>> coordinates) {
         Coordinate[] coords = new Coordinate[coordinates.size() + 1];
 
