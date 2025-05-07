@@ -5,6 +5,7 @@ import com.tridev.geoSphere.dto.GeofenceRequest.GeofenceRequestDTO;
 import com.tridev.geoSphere.dto.UserGeofenceDTO.UserGeofeceRequestDTO;
 import com.tridev.geoSphere.dto.UserGeofenceDTO.UserGeofeceResponseDTO;
 import com.tridev.geoSphere.dto.common.PaginatedResponse;
+import com.tridev.geoSphere.entities.mongo.UserLocation;
 import com.tridev.geoSphere.entities.sql.GeofenceEntity;
 import com.tridev.geoSphere.entities.sql.GeofenceRequestEntity;
 import com.tridev.geoSphere.entities.sql.UserEntity;
@@ -17,6 +18,7 @@ import com.tridev.geoSphere.exceptions.BadRequestException;
 import com.tridev.geoSphere.exceptions.ResourceNotFoundException;
 import com.tridev.geoSphere.mappers.GeofenceRequestMapper;
 import com.tridev.geoSphere.mappers.UserGeofenceMapper;
+import com.tridev.geoSphere.repositories.mongo.UserLocationRepository;
 import com.tridev.geoSphere.repositories.sql.GeofenceRepository;
 import com.tridev.geoSphere.repositories.sql.GeofenceRequestRepository;
 import com.tridev.geoSphere.repositories.sql.UserGeofenceRepository;
@@ -34,7 +36,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,6 +71,10 @@ public class UserGeofenceService {
 
     @Autowired
     private GeofenceRequestRepository geofenceRequestRepository;
+
+    @Autowired
+    private UserLocationRepository userLocationRepository;
+
 
 
 
@@ -153,22 +161,70 @@ public class UserGeofenceService {
         try {
             // Validate the geofenceId
             if (geofenceId == null || geofenceId <= 0) {
-                throw new BadRequestException("Invalid geofence ID");
+                throw new BadRequestException(CommonValidationConstant.GEOFENCE_NOT_FOUND);
             }
+
+            // Get all user-geofence relationships for this geofence
+            List<UserGeofenceEntity> userGeofences = userGeofenceRepo.findByGeofenceId(geofenceId);
+
+            // Create a map for quick lookup (userId -> UserGeofenceEntity)
+            Map<Long, UserGeofenceEntity> userGeofenceMap = userGeofences.stream()
+                    .collect(Collectors.toMap(UserGeofenceEntity::getUserId, Function.identity()));
 
             // Create pagination request
             Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-            // Get paginated results in a single query
+            // Get paginated results of users in this geofence
             Page<UserEntity> usersPage = userGeofenceRepo.findUsersByGeofenceId(geofenceId, pageable);
 
             if (usersPage.isEmpty()) {
                 throw new BadRequestException(CommonValidationConstant.USER_NOT_FOUND);
             }
 
-            // Map to response DTOs
+            // Extract user IDs for batch location fetching
+            List<Long> userIds = usersPage.getContent().stream()
+                    .map(UserEntity::getId)
+                    .collect(Collectors.toList());
+
+            // Get latest locations in a single batch query
+            List<UserLocation> latestLocations = userLocationRepository.findLatestLocationsForUsers(userIds);
+
+            // Create a map for quick lookup (userId -> latest location)
+            Map<Long, UserLocation> locationMap = latestLocations.stream()
+                    .collect(Collectors.toMap(UserLocation::getUserId, Function.identity()));
+
+            // Map to response DTOs with location and geofence status information
             List<UserGeofeceResponseDTO> responseList = usersPage.getContent().stream()
-                    .map(userGeofenceMapper::toResponseDTO)
+                    .map(user -> {
+                        UserGeofeceResponseDTO dto = userGeofenceMapper.toResponseDTO(user);
+                        UserLocation location = locationMap.get(user.getId());
+                        UserGeofenceEntity userGeofence = userGeofenceMap.get(user.getId());
+
+                        // Set isCurrentlyInside from UserGeofenceEntity if exists
+                        if (userGeofence != null && location != null) {
+                            dto.setCurrentlyInside(userGeofence.getIsCurrentlyInside());
+                        } else {
+                            // If no UserGeofenceEntity exists (shouldn't happen), default to false
+                            dto.setCurrentlyInside(false);
+                        }
+
+                        if (location != null) {
+                            // Location exists - populate all fields
+                            dto.setLocationExists(true);
+                            dto.setCurrentLocation(location.getLocation());
+                            dto.setLastLocationUpdateTime(location.getTimestamp());
+                            dto.setSpeed(location.getSpeed());
+                            dto.setHeading(location.getHeading());
+                        } else {
+                            // Location doesn't exist - set flag and null fields
+                            dto.setLocationExists(false);
+                            dto.setCurrentLocation(null);
+                            dto.setLastLocationUpdateTime(null);
+                            dto.setSpeed(null);
+                            dto.setHeading(null);
+                        }
+                        return dto;
+                    })
                     .collect(Collectors.toList());
 
             // Create paginated response
@@ -189,8 +245,6 @@ public class UserGeofenceService {
             throw ex;
         }
     }
-
-
 
 
     public BaseResponse acceptGeofenceRequest(Long requestId) throws Exception {

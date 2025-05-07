@@ -1,9 +1,12 @@
 package com.tridev.geoSphere.utils;
 
 
+import com.tridev.geoSphere.filters.JwtFilter;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -33,7 +36,7 @@ public class JwtUtil {
 
 
 
-    public String extractUsername(String token){
+    public String extractUsername(String token)  {
         Claims claims = extractAllClaims(token);
 
         return claims.getSubject();
@@ -55,11 +58,18 @@ public class JwtUtil {
 
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try{
+            return Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        }catch (JwtFilter.JwtAuthenticationException ex){
+            throw new JwtFilter.JwtAuthenticationException(ex.getStatus(), ex.getMessage());
+        }catch (ExpiredJwtException ex){
+            throw new JwtFilter.JwtAuthenticationException(HttpStatus.UNAUTHORIZED, "Token expired");
+        }
+
     }
 
 

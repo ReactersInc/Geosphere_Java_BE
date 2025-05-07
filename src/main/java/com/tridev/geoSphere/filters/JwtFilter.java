@@ -98,10 +98,15 @@ public class JwtFilter extends OncePerRequestFilter {
         } catch (AuthenticationException ex) {
             SecurityContextHolder.clearContext();
             throw ex;
+        } catch (JwtAuthenticationException ex) {
+            log.error("Invalid or Expired Token", ex);
+            SecurityContextHolder.clearContext();
+            sendErrorResponse(request,response, ex.getStatus(), ex.getMessage());
+
         } catch (Exception ex) {
             log.error("Unexpected error during JWT authentication", ex);
             SecurityContextHolder.clearContext();
-            throw new AuthenticationServiceException("Internal server error", ex);
+            sendErrorResponse(request,response, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
         }
     }
 
@@ -146,7 +151,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
     }
 
-    private void sendErrorResponse(HttpServletResponse response,
+    private void sendErrorResponse(HttpServletRequest request,HttpServletResponse response,
                                    HttpStatus status,
                                    String message) throws IOException {
         ErrorResponse errorResponse = new ErrorResponse(
@@ -154,7 +159,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 status.value(),
                 status.getReasonPhrase(),
                 message,
-                ""
+                request.getRequestURI()
         );
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -162,7 +167,7 @@ public class JwtFilter extends OncePerRequestFilter {
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 
-    private static class JwtAuthenticationException extends RuntimeException {
+    public static class JwtAuthenticationException extends RuntimeException {
         private final HttpStatus status;
 
         public JwtAuthenticationException(HttpStatus status, String message) {
