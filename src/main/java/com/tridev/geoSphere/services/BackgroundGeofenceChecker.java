@@ -2,6 +2,7 @@ package com.tridev.geoSphere.services;
 
 import com.tridev.geoSphere.entities.mongo.UserLocation;
 import com.tridev.geoSphere.entities.sql.UserGeofenceEntity;
+import com.tridev.geoSphere.exceptions.BadRequestException;
 import com.tridev.geoSphere.repositories.mongo.UserLocationRepository;
 import com.tridev.geoSphere.repositories.sql.UserGeofenceRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class BackgroundGeofenceChecker {
 
     // Run every 5 minutes
 //    @Scheduled(fixedRate = 300000)
-    public void checkGeofenceStatus() {
+    public void checkGeofenceStatus() throws BadRequestException {
         log.info("Running background geofence check");
 
         // Get all user-geofence connections

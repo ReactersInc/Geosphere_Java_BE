@@ -33,7 +33,8 @@ public interface UserGeofenceRepository extends JpaRepository<UserGeofenceEntity
 
     List<UserGeofenceEntity> findByUserId(Long userId);
 
-    List<UserGeofenceEntity> findByGeofenceId(Long geofenceId);
+    @Query("SELECT ug FROM UserGeofenceEntity ug WHERE ug.geofenceId = :geofenceId")
+    List<UserGeofenceEntity> findByGeofenceId(@Param("geofenceId") Long geofenceId);
 
     Optional<UserGeofenceEntity> findByUserIdAndGeofenceId(Long userId, Long geofenceId);
 
