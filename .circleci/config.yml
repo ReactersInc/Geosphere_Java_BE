@@ -42,11 +42,11 @@ jobs:
 
       - run:
           name: Add EC2 Server to Known Hosts
-          command: ssh-keyscan -H $JAVA_EC2_IP >> ~/.ssh/known_hosts
+          command: ssh-keyscan -H $AWS_SERVER_IP >> ~/.ssh/known_hosts
 
       - run:
           name: Execute Deployment Script on Java EC2
-          command: ssh -o StrictHostKeyChecking=no ubuntu@$JAVA_EC2_IP "cd /GeoSphere_Java_BE && sudo sh deploy.sh"
+          command: ssh -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP "cd /GeoSphere_Java_BE && sudo sh deploy_fast.sh"
 
       - slack/notify:
           event: pass
