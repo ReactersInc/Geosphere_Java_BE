@@ -13,4 +13,6 @@ public interface UserContactsRepository extends JpaRepository<UserContactsEntity
 
 
     boolean existsByUserIdAndContactUserId(Long userId, Long contactUserId);
+
+    Integer countByUserIdAndStatus(Long userId, Integer i);
 }
