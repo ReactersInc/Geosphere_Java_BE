@@ -27,4 +27,6 @@ public interface UserRepo extends JpaRepository<UserEntity,Long > {
     List<UserEntity> findAllById(Iterable<Long> ids);
 
     Optional<UserEntity> findByIdAndStatus(Long userId, Integer value);
+
+    Optional<UserEntity> findByEmail(String newEmail);
 }

@@ -3,6 +3,7 @@ package com.tridev.geoSphere.services;
 import com.tridev.geoSphere.constant.CommonValidationConstant;
 import com.tridev.geoSphere.dto.Profile.ProfileDTO;
 import com.tridev.geoSphere.dto.User.GeofenceDetailsDTO;
+import com.tridev.geoSphere.dto.User.UserDetailsDTO;
 import com.tridev.geoSphere.dto.User.UserGeofenceDTO;
 import com.tridev.geoSphere.entities.sql.GeofenceEntity;
 import com.tridev.geoSphere.entities.sql.UserEntity;
@@ -64,7 +65,11 @@ public class ProfileService {
         profileDTO.setEmail(user.getEmail());
         profileDTO.setFirstName(user.getFirstName());
         profileDTO.setLastName(user.getLastName());
-
+        profileDTO.setPublicProfile(user.getPublicProfile());
+        profileDTO.setIsVerified(user.getIsVerified());
+        profileDTO.setPhotoUrl(user.getPhoto());
+        profileDTO.setCreatedAt(user.getCreatedAt());
+        profileDTO.setId(userId);
         // Prepare UserGeofenceDTO
         UserGeofenceDTO userGeofenceDTO = new UserGeofenceDTO();
 
@@ -115,4 +120,60 @@ public class ProfileService {
 
         return GeosphereServiceUtility.getBaseResponse(profileDTO);
     }
+
+    @Transactional
+    public BaseResponse updateUserProfile(UserDetailsDTO userDetailsDTO) throws BadRequestException {
+        try {
+            Long userId = jwtUtil.getUserIdFromToken();
+            Optional<UserEntity> entityOpt = userRepo.findById(userId);
+
+            if (entityOpt.isEmpty()) {
+                throw new BadRequestException(CommonValidationConstant.USER_NOT_FOUND);
+            }
+
+            UserEntity user = entityOpt.get();
+
+            // Disallow role update
+            if (userDetailsDTO.getRole() != null) {
+                throw new BadRequestException(CommonValidationConstant.ROLE_UPDATE_NOT_ALLOWED);
+            }
+
+            // Email update logic
+            String newEmail = userDetailsDTO.getEmail();
+            if (newEmail != null && !newEmail.equalsIgnoreCase(user.getEmail())) {
+                Optional<UserEntity> userWithSameEmail = userRepo.findByEmail(newEmail);
+                if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId().equals(user.getId())) {
+                    throw new BadRequestException(CommonValidationConstant.EMAIL_IS_ALREADY_IN_USE);
+                }
+                user.setEmail(newEmail);
+                user.setIsVerified(false); // Mark as unverified after email change
+            }
+
+            // Update only non-null fields
+            if (userDetailsDTO.getFirstName() != null) {
+                user.setFirstName(userDetailsDTO.getFirstName());
+            }
+
+            if (userDetailsDTO.getLastName() != null) {
+                user.setLastName(userDetailsDTO.getLastName());
+            }
+
+            if (userDetailsDTO.getPhoto() != null) {
+                user.setPhoto(userDetailsDTO.getPhoto());
+            }
+
+            if (userDetailsDTO.getPublicProfile() != null) {
+                user.setPublicProfile(userDetailsDTO.getPublicProfile());
+            }
+
+            // Save the updated user
+            userRepo.save(user);
+
+            return GeosphereServiceUtility.getBaseResponse("Profile updated successfully.");
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+
 }
