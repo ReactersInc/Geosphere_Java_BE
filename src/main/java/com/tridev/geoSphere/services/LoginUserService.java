@@ -36,7 +36,7 @@ public class LoginUserService {
 
 
 
-    public BaseResponse loginUser(LoginDTO data) throws Exception {
+    public BaseResponse  loginUser(LoginDTO data) throws Exception {
         log.info("login user");
         try {
             authenticationManager.authenticate(
@@ -46,7 +46,6 @@ public class LoginUserService {
                     .orElseThrow(() -> new BadCredentialsException(CommonValidationConstant.USER_NOT_FOUND));
             log.info("user:{}", user);
 
-            if (Boolean.TRUE.equals(user.getIsVerified())) {
                 String jwt = jwtUtil.generateToken(
                         user.getEmail(),
                         user.getId(),
@@ -55,19 +54,13 @@ public class LoginUserService {
                 );
                 LoginResponseDTO loginResponseDTO = new LoginResponseDTO();
                 loginResponseDTO.setToken(jwt);
+                loginResponseDTO.setIsVerified(user.getIsVerified());
                 return GeosphereServiceUtility.getBaseResponse(loginResponseDTO);
-            } else {
-                throw new BadRequestException(CommonValidationConstant.USER_NOT_VERIFIED);
-            }
-
         } catch (Exception e) {
             log.error("Error during authentication: {}", e.getMessage());
                 throw new ValidationFailureException(ErrorConstants.INVALID_CREDENTIALS, ErrorConstants.INVALID_CREDENTIALS_DESC, 400);
           }
     }
-
-
-
 }
 
 
