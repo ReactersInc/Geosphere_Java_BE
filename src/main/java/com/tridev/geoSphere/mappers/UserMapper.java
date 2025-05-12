@@ -40,5 +40,6 @@ ProfileDTO toProfile(UserEntity userEntity);
 
 
     PublicProfileResponseDTO toPublicProfileDTO(UserEntity user);
+
 }
 
