@@ -183,11 +183,11 @@ public class GeofenceService {
                 throw new ResourceNotFoundException(CommonValidationConstant.GEOFENCE_NOT_FOUND);
             }
 
-            List<GeofenceResponse> responseList = geofencePage.getContent().stream()
+            List<GeofenceResponseDTO> responseList = geofencePage.getContent().stream()
                     .map(geofenceMapper::entityToResponse)
                     .collect(Collectors.toList());
 
-            PaginatedResponse<GeofenceResponse> paginatedResponse = new PaginatedResponse<>();
+            PaginatedResponse<GeofenceResponseDTO> paginatedResponse = new PaginatedResponse<>();
             paginatedResponse.setList(responseList);
             paginatedResponse.setPage(geofencePage.getNumber());
             paginatedResponse.setSize(geofencePage.getSize());
