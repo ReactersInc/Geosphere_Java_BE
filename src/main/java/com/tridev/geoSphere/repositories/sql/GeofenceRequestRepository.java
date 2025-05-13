@@ -5,6 +5,7 @@ import com.tridev.geoSphere.enums.InvitationStatus;
 import com.tridev.geoSphere.enums.ResponseStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface GeofenceRequestRepository extends JpaRepository<GeofenceRequestEntity, Long> {
@@ -15,4 +16,6 @@ public interface GeofenceRequestRepository extends JpaRepository<GeofenceRequest
 
 
     Integer countByUserIdAndResponseStatus(Long userId, ResponseStatus responseStatus);
+
+    List<GeofenceRequestEntity> findAllByUserId(Long userId);
 }

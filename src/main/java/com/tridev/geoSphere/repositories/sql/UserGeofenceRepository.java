@@ -51,4 +51,5 @@ public interface UserGeofenceRepository extends JpaRepository<UserGeofenceEntity
     @Query("SELECT COUNT(DISTINCT u.userId) FROM UserGeofenceEntity u WHERE u.geofenceId IN :geofenceIds")
     Integer countDistinctUserIdByGeofenceIds(@Param("geofenceIds") List<Long> geofenceIds);
 
+    List<UserGeofenceEntity> findAllByUserIdAndStatus(Long userId, Integer value);
 }
