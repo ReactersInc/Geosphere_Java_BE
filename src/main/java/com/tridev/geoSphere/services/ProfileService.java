@@ -85,13 +85,12 @@ public class ProfileService {
 
         // Total connections
         Integer totalConnections = userContactsRepo.countByUserIdAndStatus(userId, Status.ACTIVE.getValue());
-        Integer pendingGeofenceRequests = Optional.ofNullable(
-                geofenceRequestRepo.countByUserIdAndResponseStatus(userId, ResponseStatus.PENDING)
-        ).orElse(0);
 
-        Integer pendingConnectionRequests = Optional.ofNullable(
-                connectionRequestRepo.countByTargetUserIdAndStatus(userId, Status.PENDING.getValue())
-        ).orElse(0);
+        // Pending geofence requests
+        Integer pendingGeofenceRequests = geofenceRequestRepo.countByUserIdAndStatus(userId, Status.PENDING.getValue());
+
+        // Pending connection requests
+        Integer pendingConnectionRequests = connectionRequestRepo.countByTargetUserIdAndStatus(userId, Status.PENDING.getValue());
 
         // Currently inside geofence
         Optional<UserGeofenceEntity> currentGeofenceOpt = userGeofenceRepo
@@ -208,7 +207,7 @@ public class ProfileService {
             // Soft delete Geofence Requests
             List<GeofenceRequestEntity> requests = geofenceRequestRepo.findAllByUserId(userId);
             for (GeofenceRequestEntity req : requests) {
-                req.setStatus(InvitationStatus.DELETED);
+                req.setStatus(Status.DELETED.getValue());
             }
             geofenceRequestRepo.saveAll(requests);
 

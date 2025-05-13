@@ -3,7 +3,7 @@ package com.tridev.geoSphere.utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tridev.geoSphere.dto.Geofence.Coordinates;
-import com.tridev.geoSphere.dto.Geofence.GeofenceResponse;
+import com.tridev.geoSphere.dto.Geofence.GeofenceResponseDTO;
 import com.tridev.geoSphere.entities.sql.GeofenceEntity;
 
 import java.util.Collections;
@@ -35,8 +35,8 @@ public class GeofenceConversionUtil {
         return colorsRaw != null ? colorsRaw : "";
     }
 
-    public static GeofenceResponse convertEntityToResponse(GeofenceEntity entity) {
-        GeofenceResponse response = new GeofenceResponse();
+    public static GeofenceResponseDTO convertEntityToResponse(GeofenceEntity entity) {
+        GeofenceResponseDTO response = new GeofenceResponseDTO();
         response.setId(entity.getId());
         response.setName(entity.getName());
         response.setDescription(entity.getDescription());
