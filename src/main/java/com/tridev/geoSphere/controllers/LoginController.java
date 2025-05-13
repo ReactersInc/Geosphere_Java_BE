@@ -1,6 +1,9 @@
 package com.tridev.geoSphere.controllers;
 
+import com.tridev.geoSphere.config.ValidationFailureException;
 import com.tridev.geoSphere.dto.authentications.LoginDTO;
+import com.tridev.geoSphere.exceptions.BadRequestException;
+import com.tridev.geoSphere.exceptions.UnAuthorizedAccessException;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.services.LoginUserService;
 import com.tridev.geoSphere.utils.UserServiceDetailsImpl;
@@ -24,7 +27,7 @@ public class LoginController {
 
 
     @PostMapping
-    public BaseResponse loginUser(@RequestBody LoginDTO data)throws Exception{
+    public BaseResponse loginUser(@RequestBody LoginDTO data)throws Exception {
         return loginUserService.loginUser(data);
     }
 }

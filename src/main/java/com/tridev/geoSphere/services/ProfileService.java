@@ -19,6 +19,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -93,18 +94,19 @@ public class ProfileService {
         Integer pendingConnectionRequests = connectionRequestRepo.countByTargetUserIdAndStatus(userId, Status.PENDING.getValue());
 
         // Currently inside geofence
-        Optional<UserGeofenceEntity> currentGeofenceOpt = userGeofenceRepo
-                .findFirstByUserIdAndIsCurrentlyInsideTrue(userId);
+        List<UserGeofenceEntity> userGeofences = userGeofenceRepo
+                .findTop10ByUserIdAndStatusOrderByIdDesc(userId,Status.ACTIVE.getValue());
 
-        GeofenceDetailsDTO inWitchGeofence = null;
-        if (currentGeofenceOpt.isPresent()) {
-            Long geofenceId = currentGeofenceOpt.get().getGeofenceId();
-            Optional<GeofenceEntity> geofenceEntity = geofenceRepo.findById(geofenceId);
-            if (geofenceEntity.isPresent()) {
-                GeofenceEntity gf = geofenceEntity.get();
-                inWitchGeofence = new GeofenceDetailsDTO(gf.getId(), gf.getName(), gf.getDescription());
-            }
+        List<GeofenceDetailsDTO> inWitchGeofence = new ArrayList<>();
+
+        for (UserGeofenceEntity userGeofence : userGeofences) {
+            Optional<GeofenceEntity> geofenceEntity = geofenceRepo.findById(userGeofence.getGeofenceId());
+            geofenceEntity.ifPresent(gf ->
+                    inWitchGeofence.add(new GeofenceDetailsDTO(gf.getId(), gf.getName(), gf.getDescription()))
+            );
         }
+
+
 
         userGeofenceDTO.setTotalGeofence(totalGeofence);
         userGeofenceDTO.setTotalGeofenceInUse(totalGeofenceInUse);
