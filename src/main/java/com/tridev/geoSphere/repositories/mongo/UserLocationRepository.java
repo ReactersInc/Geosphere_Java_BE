@@ -4,10 +4,11 @@ import com.tridev.geoSphere.entities.mongo.UserLocation;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-
+@Repository
 public interface UserLocationRepository extends MongoRepository<UserLocation, String> {
     List<UserLocation> findByUserId(Long userId);
 

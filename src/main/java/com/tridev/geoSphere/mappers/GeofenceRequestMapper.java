@@ -8,5 +8,7 @@ import org.mapstruct.Mapper;
 public interface GeofenceRequestMapper {
 
     GeofenceRequestEntity toEntity(GeofenceRequestDTO geofenceRequestDTO);
+
+    GeofenceRequestDTO toDTO(GeofenceRequestEntity geofenceRequestEntity);
 //    GeofenceRequestDTO toDTO(GeofenceRequestEntity geofenceRequestEntity);
 }

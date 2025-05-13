@@ -11,5 +11,5 @@ public class GeofencePaginationResponse {
     private int pageSize;
     private long totalRecords;
     private String sortOrder;
-    private List<GeofenceResponse> data;
+    private List<GeofenceResponseDTO> data;
 }

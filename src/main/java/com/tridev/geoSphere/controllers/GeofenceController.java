@@ -24,10 +24,6 @@ public class GeofenceController {
     @Autowired
     private UserGeofenceService userGeofenceService;
 
-
-
-
-
     @PostMapping
     public BaseResponse createGeofence(@RequestBody GeofenceRequest request) throws Exception  {
 
@@ -110,6 +106,15 @@ public class GeofenceController {
                                                 @RequestParam(defaultValue = "10") int size) throws Exception {
 
         return userGeofenceService.getAllUsersInGeofence(geofenceId, page, size);
+
+    }
+
+
+    @GetMapping("/get-geofence-request")
+    public BaseResponse getGeofenceRequest(@RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "10") int size) throws Exception {
+
+        return userGeofenceService.getGeofenceRequest(page, size);
 
     }
 }
