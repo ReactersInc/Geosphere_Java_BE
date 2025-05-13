@@ -2,6 +2,7 @@ package com.tridev.geoSphere.services;
 
 import com.tridev.geoSphere.constant.CommonValidationConstant;
 import com.tridev.geoSphere.dto.GeofenceRequest.GeofenceRequestDTO;
+import com.tridev.geoSphere.dto.GeofenceRequest.GeofenceRequestResponseDTO;
 import com.tridev.geoSphere.dto.UserGeofenceDTO.UserGeofeceRequestDTO;
 import com.tridev.geoSphere.dto.UserGeofenceDTO.UserGeofeceResponseDTO;
 import com.tridev.geoSphere.dto.common.PaginatedResponse;
@@ -17,6 +18,7 @@ import com.tridev.geoSphere.enums.Status;
 import com.tridev.geoSphere.exceptions.BadRequestException;
 import com.tridev.geoSphere.exceptions.ResourceNotFoundException;
 import com.tridev.geoSphere.mappers.GeofenceRequestMapper;
+import com.tridev.geoSphere.mappers.GeofenceRequestResponseMapper;
 import com.tridev.geoSphere.mappers.UserGeofenceMapper;
 import com.tridev.geoSphere.repositories.mongo.UserLocationRepository;
 import com.tridev.geoSphere.repositories.sql.GeofenceRepository;
@@ -75,6 +77,9 @@ public class UserGeofenceService {
     @Autowired
     private UserLocationRepository userLocationRepository;
 
+    @Autowired
+    private GeofenceRequestResponseMapper geofenceRequestResponseMapper;
+
 
 
 
@@ -100,7 +105,7 @@ public class UserGeofenceService {
 
         Long userId = jwtUtil.getUserIdFromToken();
 
-        Optional<GeofenceRequestEntity> byUserIdAndRecipientEmailAndGeofenceIdAndStatus = geofenceRequestRepository.findByUserIdAndRecipientEmailAndGeofenceIdAndStatus(userId, userGeofeceRequestDTO.getEmail(), userGeofeceRequestDTO.getGeofenceId(), InvitationStatus.ACTIVE);
+        Optional<GeofenceRequestEntity> byUserIdAndRecipientEmailAndGeofenceIdAndStatus = geofenceRequestRepository.findByUserIdAndRecipientEmailAndGeofenceIdAndStatus(userId, userGeofeceRequestDTO.getEmail(), userGeofeceRequestDTO.getGeofenceId(), Status.PENDING.getValue());
 
         if(byUserIdAndRecipientEmailAndGeofenceIdAndStatus.isPresent()){
             throw new BadRequestException(CommonValidationConstant.REQUEST_ALREADY_SENT);
@@ -128,7 +133,7 @@ public class UserGeofenceService {
             GeofenceRequestEntity entity = geofenceRequestMapper.toEntity(geofenceRequestDTO);
             entity.setGeofenceId(userGeofeceRequestDTO.getGeofenceId());
 
-            entity.setStatus(InvitationStatus.ACTIVE);
+            entity.setStatus(Status.PENDING.getValue());
 
             entity.setNotificationStatus(NotificationStatus.PENDING);
 
@@ -255,7 +260,7 @@ public class UserGeofenceService {
 
 
 
-            Optional<GeofenceRequestEntity> geofenceRequest = geofenceRequestRepository.findByIdAndStatus(requestId, InvitationStatus.ACTIVE);
+            Optional<GeofenceRequestEntity> geofenceRequest = geofenceRequestRepository.findByIdAndStatus(requestId, Status.PENDING.getValue());
 
             if (geofenceRequest.isPresent() && byIdAndStatus.isPresent()) {
 
@@ -273,7 +278,8 @@ public class UserGeofenceService {
 
                 // Update the request status to ACCEPTED
 
-                requestEntity.setResponseStatus(ResponseStatus.ACCEPTED);
+
+                requestEntity.setStatus(Status.ACCEPTED.getValue());
                 geofenceRequestRepository.save(requestEntity);
 
                 return GeosphereServiceUtility.getBaseResponseWithoutData();
@@ -292,7 +298,7 @@ public class UserGeofenceService {
         try {
             Long userId = jwtUtil.getUserIdFromToken();
 
-            Optional<GeofenceRequestEntity> geofenceRequest = geofenceRequestRepository.findByIdAndStatus(requestId, InvitationStatus.ACTIVE);
+            Optional<GeofenceRequestEntity> geofenceRequest = geofenceRequestRepository.findByIdAndStatus(requestId, Status.PENDING.getValue());
 
             if (geofenceRequest.isPresent()) {
                 GeofenceRequestEntity requestEntity = geofenceRequest.get();
@@ -300,7 +306,8 @@ public class UserGeofenceService {
 
                 // Update the request status to ACCEPTED
 
-                requestEntity.setResponseStatus(ResponseStatus.REJECTED);
+
+                requestEntity.setStatus(Status.REJECTED.getValue());
                 geofenceRequestRepository.save(requestEntity);
 
                 return GeosphereServiceUtility.getBaseResponseWithoutData();
@@ -315,6 +322,70 @@ public class UserGeofenceService {
     }
 
 
+
+    public BaseResponse getGeofenceRequest(int page, int size) throws Exception {
+        try {
+            Long userId = jwtUtil.getUserIdFromToken();
+            Optional<UserEntity> user = userRepo.findByIdAndStatus(userId, Status.ACTIVE.getValue());
+
+            if(user.isPresent()) {
+                UserEntity userEntity = user.get();
+                String email = userEntity.getEmail();
+
+                Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+                Page<GeofenceRequestEntity> geofenceRequests = geofenceRequestRepository.findByRecipientEmailAndStatus(
+                        email, Status.PENDING.getValue(), pageable);
+
+                if (geofenceRequests.isEmpty()) {
+                    throw new BadRequestException(CommonValidationConstant.REQUEST_NOT_FOUND);
+                }
+
+                // Fetch all geofence IDs from the requests
+                List<Long> geofenceIds = geofenceRequests.getContent().stream()
+                        .map(GeofenceRequestEntity::getGeofenceId)
+                        .collect(Collectors.toList());
+
+                // Fetch all creator user IDs from the requests
+                List<Long> creatorIds = geofenceRequests.getContent().stream()
+                        .map(GeofenceRequestEntity::getUserId)
+                        .collect(Collectors.toList());
+
+                // Fetch all geofences in one query
+                Map<Long, GeofenceEntity> geofenceMap = geofenceRepository.findAllById(geofenceIds).stream()
+                        .collect(Collectors.toMap(GeofenceEntity::getId, Function.identity()));
+
+                // Fetch all users in one query
+                Map<Long, UserEntity> userMap = userRepo.findAllById(creatorIds).stream()
+                        .collect(Collectors.toMap(UserEntity::getId, Function.identity()));
+
+                // Map to response DTO
+                List<GeofenceRequestResponseDTO> responseList = geofenceRequests.getContent().stream()
+                        .map(request -> {
+                            GeofenceEntity geofence = geofenceMap.get(request.getGeofenceId());
+                            UserEntity creator = userMap.get(request.getUserId());
+                            return geofenceRequestResponseMapper.toResponseDTO(request, geofence, creator);
+                        })
+                        .collect(Collectors.toList());
+
+                PaginatedResponse<GeofenceRequestResponseDTO> paginatedResponse = new PaginatedResponse<>();
+                paginatedResponse.setList(responseList);
+                paginatedResponse.setPage(geofenceRequests.getNumber());
+                paginatedResponse.setSize(geofenceRequests.getSize());
+                paginatedResponse.setTotalElements(geofenceRequests.getTotalElements());
+                paginatedResponse.setTotalPages(geofenceRequests.getTotalPages());
+
+                return GeosphereServiceUtility.getBaseResponse(paginatedResponse);
+            } else {
+                throw new BadRequestException(CommonValidationConstant.USER_NOT_FOUND);
+            }
+        } catch (ResourceNotFoundException ex) {
+            log.warn("No geofence requests found: {}", ex.getMessage());
+            throw ex;
+        } catch (BadRequestException ex) {
+            log.warn("Bad request for geofence requests: {}", ex.getMessage());
+            throw ex;
+        }
+    }
 
 
 

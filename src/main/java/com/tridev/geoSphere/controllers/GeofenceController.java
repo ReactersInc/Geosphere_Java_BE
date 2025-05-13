@@ -112,4 +112,13 @@ public class GeofenceController {
         return userGeofenceService.getAllUsersInGeofence(geofenceId, page, size);
 
     }
+
+
+    @GetMapping("/get-geofence-request")
+    public BaseResponse getGeofenceRequest(@RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "10") int size) throws Exception {
+
+        return userGeofenceService.getGeofenceRequest(page, size);
+
+    }
 }
