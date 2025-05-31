@@ -2,9 +2,9 @@ package com.tridev.geoSphere.enums;
 
 public enum NotificationStatus {
 
-    PENDING("Pending"),
-    SUCCESS("Success"),
-    FAILED("Failed");
+    PENDING("PENDING"),
+    SUCCESS("SUCCESS"),
+    FAILED("FAILED");
 
     private final String value;
 
