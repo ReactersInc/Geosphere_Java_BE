@@ -106,7 +106,7 @@ public class JwtFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             log.error("Unexpected error during JWT authentication", ex);
             SecurityContextHolder.clearContext();
-            sendErrorResponse(request,response, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+            sendErrorResponse(request,response, HttpStatus.UNAUTHORIZED, "Invalid or expired token");
         }
     }
 

@@ -28,7 +28,5 @@ public interface GeofenceRepository extends JpaRepository<GeofenceEntity, Long> 
     List<GeofenceEntity> findByCreatedBy(Long createdBy);
 
 
-
-
-
+    List<GeofenceEntity> findAllByCreatedByAndStatus(Long userId, Integer value);
 }

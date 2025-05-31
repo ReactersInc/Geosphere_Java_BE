@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/profile")
+@RequestMapping("/user")
 public class ProfileController {
 
 
@@ -26,5 +26,10 @@ public class ProfileController {
     @PutMapping
     public BaseResponse updateUserProfile(@RequestBody UserDetailsDTO userDetailsDTO) throws BadRequestException {
         return profileService.updateUserProfile(userDetailsDTO);
+    }
+
+    @DeleteMapping
+    public BaseResponse deleteUserProfile() throws BadRequestException {
+        return profileService.deleteUserProfile();
     }
 }

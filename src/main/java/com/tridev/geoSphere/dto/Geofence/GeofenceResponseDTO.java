@@ -6,12 +6,11 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GeofenceResponse {
+public class GeofenceResponseDTO {
     private Long id;
     private String name;
     private String description;

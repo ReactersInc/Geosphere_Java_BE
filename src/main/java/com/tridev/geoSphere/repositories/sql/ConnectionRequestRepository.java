@@ -23,4 +23,6 @@ public interface ConnectionRequestRepository extends JpaRepository<ConnectionReq
     List<ConnectionRequestEntity> findByRequesterUserId(Long requesterUserId);
 
     Integer countByTargetUserIdAndStatus(Long userId, Integer i);
+
+    List<ConnectionRequestEntity> findAllByRequesterUserIdOrTargetUserId(Long userId, Long userId1);
 }
