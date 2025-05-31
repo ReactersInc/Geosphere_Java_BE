@@ -36,6 +36,10 @@ public class NotificationEntity {
     private String notificationType;
 
     @Nonnull
+    @Column(name = "Title", nullable = false)
+    private String title;
+
+    @Nonnull
     @Column(name = "Message", nullable = false)
     private String message;
 
