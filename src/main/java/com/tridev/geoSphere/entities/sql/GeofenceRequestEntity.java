@@ -3,6 +3,7 @@ package com.tridev.geoSphere.entities.sql;
 import com.tridev.geoSphere.enums.InvitationStatus;
 import com.tridev.geoSphere.enums.NotificationStatus;
 import com.tridev.geoSphere.enums.ResponseStatus;
+import com.tridev.geoSphere.enums.Status;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -31,13 +32,11 @@ public class GeofenceRequestEntity extends BaseEntity {
     @Column(name = "RecipientEmail", nullable = false)
     private String recipientEmail;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "Status")
-    private InvitationStatus status = InvitationStatus.ACTIVE;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "ResponseStatus")
-    private ResponseStatus responseStatus = ResponseStatus.PENDING;
+    @Column(name = "Status")
+    private Integer status = Status.PENDING.getValue();
+
+
 
     @Enumerated(EnumType.STRING)
     @Column(name = "NotificationStatus")

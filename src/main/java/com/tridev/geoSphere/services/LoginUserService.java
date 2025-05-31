@@ -54,44 +54,52 @@ public class LoginUserService {
             if (data.getPassword() == null || data.getPassword().isBlank()) {
                 throw new ValidationFailureException("PASSWORD_REQUIRED", "Password is mandatory", 400);
             }
-//            if (data.getAppVersion() == null || data.getAppVersion().isBlank()) {
-//                throw new ValidationFailureException("APP_VERSION_REQUIRED", "App version is mandatory", 400);
-//            }
-//            if (data.getPlatformId() == null) {
-//                throw new ValidationFailureException("PLATFORM_ID_REQUIRED", "Platform ID is mandatory", 400);
-//            }
+
+            UserEntity user = registerUserRepo.findByEmailAndStatus(data.getEmail(), Status.ACTIVE.getValue())
+                    .orElseThrow(() -> new BadRequestException(CommonValidationConstant.USER_NOT_FOUND));
+
+            log.info("user:{}", user);
+
+            // Authenticate user
+            log.info("Authenticating user with email: {}", data.getEmail());
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(data.getEmail(), data.getPassword())
             );
-            UserEntity user = registerUserRepo.findByEmailAndStatus(data.getEmail(), Status.ACTIVE.getValue())
-                    .orElseThrow(() -> new BadCredentialsException(CommonValidationConstant.USER_NOT_FOUND));
-            log.info("user:{}", user);
-                String jwt = jwtUtil.generateToken(
-                        user.getEmail(),
-                        user.getId(),
-                        user.getFirstName(),
-                        user.getLastName()
-                );
-                LoginResponseDTO loginResponseDTO = new LoginResponseDTO();
-                loginResponseDTO.setToken(jwt);
-                loginResponseDTO.setIsVerified(user.getIsVerified());
-                if( !ObjectUtils.isEmpty(data.getAppVersion())) {
-                    //saving app version
-                    AppVersion appVersion = new AppVersion();
-                    appVersion.setCustomerId(user.getId());
-                    appVersion.setAppVersion(data.getAppVersion());
-                    appVersion.setPlatformId(data.getPlatformId());
-                    appVersion.setInstalledAt(data.getInstalledAt());
-                    appVersion.setCreatedBy(user.getId());
-                    appVersionRepository.save(appVersion);
-                }
-                return GeosphereServiceUtility.getBaseResponse(loginResponseDTO);
-        }catch (ValidationFailureException ex){
-            throw ex;
+            log.info("User authenticated successfully");
+            // Retrieve user entity
+
+            // Generate JWT token
+            String jwt = jwtUtil.generateToken(
+                    user.getEmail(),
+                    user.getId(),
+                    user.getFirstName(),
+                    user.getLastName()
+            );
+
+            LoginResponseDTO loginResponseDTO = new LoginResponseDTO();
+            loginResponseDTO.setToken(jwt);
+            loginResponseDTO.setIsVerified(user.getIsVerified());
+
+            if (!ObjectUtils.isEmpty(data.getAppVersion())) {
+                AppVersion appVersion = new AppVersion();
+                appVersion.setCustomerId(user.getId());
+                appVersion.setAppVersion(data.getAppVersion());
+                appVersion.setPlatformId(data.getPlatformId());
+                appVersion.setInstalledAt(data.getInstalledAt());
+                appVersion.setCreatedBy(user.getId());
+                appVersionRepository.save(appVersion);
+            }
+            return GeosphereServiceUtility.getBaseResponse(loginResponseDTO);
+        }catch ( BadCredentialsException e) {
+            log.error("Invalid credentials: {}", e.getMessage());
+            throw e;
+        } catch (ValidationFailureException e) {
+            log.error("Validation error: {}", e.getMessage());
+            throw e;
         } catch (Exception e) {
-            log.error("Error during authentication: {}", e.getMessage());
-                throw e;
-          }
+            log.error("Something went wrong: {}", e.getMessage());
+            throw e;
+        }
     }
 }
 

@@ -5,9 +5,8 @@ import com.tridev.geoSphere.dto.Profile.ProfileDTO;
 import com.tridev.geoSphere.dto.User.GeofenceDetailsDTO;
 import com.tridev.geoSphere.dto.User.UserDetailsDTO;
 import com.tridev.geoSphere.dto.User.UserGeofenceDTO;
-import com.tridev.geoSphere.entities.sql.GeofenceEntity;
-import com.tridev.geoSphere.entities.sql.UserEntity;
-import com.tridev.geoSphere.entities.sql.UserGeofenceEntity;
+import com.tridev.geoSphere.entities.sql.*;
+import com.tridev.geoSphere.enums.InvitationStatus;
 import com.tridev.geoSphere.enums.ResponseStatus;
 import com.tridev.geoSphere.enums.Status;
 import com.tridev.geoSphere.exceptions.BadRequestException;
@@ -20,6 +19,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,7 +54,7 @@ public class ProfileService {
     @Transactional
     public BaseResponse findUserByUserId() throws BadRequestException {
         Long userId = jwtUtil.getUserIdFromToken();
-        Optional<UserEntity> entity = userRepo.findById(userId);
+        Optional<UserEntity> entity = userRepo.findByIdAndStatus(userId, Status.ACTIVE.getValue());
 
         if (entity.isEmpty()) {
             throw new BadRequestException(CommonValidationConstant.USER_NOT_FOUND);
@@ -88,24 +88,25 @@ public class ProfileService {
         Integer totalConnections = userContactsRepo.countByUserIdAndStatus(userId, Status.ACTIVE.getValue());
 
         // Pending geofence requests
-        Integer pendingGeofenceRequests = geofenceRequestRepo.countByUserIdAndResponseStatus(userId, ResponseStatus.PENDING);
+        Integer pendingGeofenceRequests = geofenceRequestRepo.countByUserIdAndStatus(userId, Status.PENDING.getValue());
 
         // Pending connection requests
         Integer pendingConnectionRequests = connectionRequestRepo.countByTargetUserIdAndStatus(userId, Status.PENDING.getValue());
 
         // Currently inside geofence
-        Optional<UserGeofenceEntity> currentGeofenceOpt = userGeofenceRepo
-                .findFirstByUserIdAndIsCurrentlyInsideTrue(userId);
+        List<UserGeofenceEntity> userGeofences = userGeofenceRepo
+                .findTop10ByUserIdAndStatusOrderByIdDesc(userId,Status.ACTIVE.getValue());
 
-        GeofenceDetailsDTO inWitchGeofence = null;
-        if (currentGeofenceOpt.isPresent()) {
-            Long geofenceId = currentGeofenceOpt.get().getGeofenceId();
-            Optional<GeofenceEntity> geofenceEntity = geofenceRepo.findById(geofenceId);
-            if (geofenceEntity.isPresent()) {
-                GeofenceEntity gf = geofenceEntity.get();
-                inWitchGeofence = new GeofenceDetailsDTO(gf.getId(), gf.getName(), gf.getDescription());
-            }
+        List<GeofenceDetailsDTO> inWitchGeofence = new ArrayList<>();
+
+        for (UserGeofenceEntity userGeofence : userGeofences) {
+            Optional<GeofenceEntity> geofenceEntity = geofenceRepo.findById(userGeofence.getGeofenceId());
+            geofenceEntity.ifPresent(gf ->
+                    inWitchGeofence.add(new GeofenceDetailsDTO(gf.getId(), gf.getName(), gf.getDescription()))
+            );
         }
+
+
 
         userGeofenceDTO.setTotalGeofence(totalGeofence);
         userGeofenceDTO.setTotalGeofenceInUse(totalGeofenceInUse);
@@ -125,7 +126,7 @@ public class ProfileService {
     public BaseResponse updateUserProfile(UserDetailsDTO userDetailsDTO) throws BadRequestException {
         try {
             Long userId = jwtUtil.getUserIdFromToken();
-            Optional<UserEntity> entityOpt = userRepo.findById(userId);
+            Optional<UserEntity> entityOpt = userRepo.findByIdAndStatus(userId,Status.ACTIVE.getValue());
 
             if (entityOpt.isEmpty()) {
                 throw new BadRequestException(CommonValidationConstant.USER_NOT_FOUND);
@@ -175,5 +176,57 @@ public class ProfileService {
         }
     }
 
+    @Transactional
+    public BaseResponse deleteUserProfile() throws BadRequestException {
+        try {
+            Long userId = jwtUtil.getUserIdFromToken();
+            Optional<UserEntity> entityOpt = userRepo.findByIdAndStatus(userId, Status.ACTIVE.getValue());
+
+            if (entityOpt.isEmpty()) {
+                throw new BadRequestException(CommonValidationConstant.USER_NOT_FOUND);
+            }
+            // Soft delete UserGeofence Mappings
+            List<UserGeofenceEntity> userGeofenceMappings = userGeofenceRepo.findAllByUserIdAndStatus(userId, Status.ACTIVE.getValue());
+            for (UserGeofenceEntity mapping : userGeofenceMappings) {
+                mapping.setStatus(Status.DELETED.getValue());
+            }
+            userGeofenceRepo.saveAll(userGeofenceMappings);
+
+            // Soft delete Geofences created by user
+            List<GeofenceEntity> userGeofences = geofenceRepo.findAllByCreatedByAndStatus(userId, Status.ACTIVE.getValue());
+            for (GeofenceEntity geo : userGeofences) {
+                geo.setStatus(Status.DELETED.getValue());
+            }
+            geofenceRepo.saveAll(userGeofences);
+
+            // Soft delete User Contacts
+            List<UserContactsEntity> userContacts = userContactsRepo.findAllByUserIdOrContactUserId(userId, userId);
+            for (UserContactsEntity contact : userContacts) {
+                contact.setStatus(Status.DELETED.getValue());
+            }
+            userContactsRepo.saveAll(userContacts);
+
+            // Soft delete Geofence Requests
+            List<GeofenceRequestEntity> requests = geofenceRequestRepo.findAllByUserId(userId);
+            for (GeofenceRequestEntity req : requests) {
+                req.setStatus(Status.DELETED.getValue());
+            }
+            geofenceRequestRepo.saveAll(requests);
+
+            // Soft delete Connection Requests
+            List<ConnectionRequestEntity> connReqs = connectionRequestRepo.findAllByRequesterUserIdOrTargetUserId(userId, userId);
+            for (ConnectionRequestEntity req : connReqs) {
+                req.setStatus(Status.DELETED.getValue());
+            }
+            connectionRequestRepo.saveAll(connReqs);
+            // Soft delete User
+            UserEntity user = entityOpt.get();
+            user.setStatus(Status.DELETED.getValue());
+            userRepo.save(user);
+            return GeosphereServiceUtility.getBaseResponse("User deleted successfully.");
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 
 }
