@@ -8,10 +8,12 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -102,4 +104,24 @@ public class JwtUtil {
         return !isTokenExpired(token);
     }
 
+    public String getUsernameFromToken(String token) {
+        try {
+            return extractUsername(token);
+        } catch (JwtFilter.JwtAuthenticationException ex) {
+            throw new JwtFilter.JwtAuthenticationException(ex.getStatus(), ex.getMessage());
+        } catch (ExpiredJwtException ex) {
+            throw new JwtFilter.JwtAuthenticationException(HttpStatus.UNAUTHORIZED, "Token expired");
+        }
+    }
+
+    public Collection<? extends GrantedAuthority> getAuthoritiesFromToken(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            return claims.get("authorities", Collection.class);
+        } catch (JwtFilter.JwtAuthenticationException ex) {
+            throw new JwtFilter.JwtAuthenticationException(ex.getStatus(), ex.getMessage());
+        } catch (ExpiredJwtException ex) {
+            throw new JwtFilter.JwtAuthenticationException(HttpStatus.UNAUTHORIZED, "Token expired");
+        }
+    }
 }
