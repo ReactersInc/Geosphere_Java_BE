@@ -114,10 +114,11 @@ public class FcmTokenService {
         FCMTokenEntity fcmTokenEntity = fcmTokenOpt.get();
         // Create notification entity with PENDING status
         NotificationEntity notification = new NotificationEntity();
-        notification.setUserId(userId.intValue());
+        notification.setUserId(fcmTokenEntity.getUserId().intValue());
         notification.setNotificationType(notificationType);
         notification.setMessage(body);
         notification.setFcmTokenId(fcmTokenEntity.getId());
+        notification.setTitle(title);
         notification.setStatus(NotificationStatus.PENDING.getValue());
 
         // Save initial notification with PENDING status
@@ -125,8 +126,12 @@ public class FcmTokenService {
 
         Message message = Message.builder()
                 .setToken(token)
-                .putData("title", title)
-                .putData("body", body)
+                .setNotification(Notification.builder()
+                        .setTitle(title)
+                        .setBody(body)
+                        .build()
+                )
+                .putData("deviceId", String.valueOf(fcmTokenEntity.getDeviceId()))
                 .build();
 
         try {
