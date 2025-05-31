@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "Notification")
-public class NotificationEntity extends BaseEntity {
+public class NotificationEntity {
 
     @Id
     @Nonnull
@@ -38,13 +39,15 @@ public class NotificationEntity extends BaseEntity {
     @Column(name = "Message", nullable = false)
     private String message;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "Status")
-    private NotificationStatus status = NotificationStatus.PENDING;
+    private String status = NotificationStatus.PENDING.getValue();
 
     @Column(name = "SentAt")
     private LocalDateTime sentAt;
 
     @Column(name = "SentBy")
     private Integer sentBy;
+
+    @Column(name = "CreatedAt")
+    private LocalDateTime createdAt;
 }
