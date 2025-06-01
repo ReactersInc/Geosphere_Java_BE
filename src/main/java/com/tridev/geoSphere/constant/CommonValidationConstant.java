@@ -50,6 +50,8 @@ public class CommonValidationConstant {
     public static final String HARDWARE_ALREADY_ASSIGNED = "This hardware is already assigned to the user.";
     public static final String HARDWARE_ALREADY_EXISTS ="Hardware with this MAC address already exists." ;
     public static final String INVALID_HARDWARE_ID = "Invalid hardware ID";
+    public static final String INVALID_LAT_LONG = "Latitude and Longitude cannot be null or empty";
+    public static final String INVALID_HARDWARE = "Invalid hardware details provided";
 
     private CommonValidationConstant() {
     }
