@@ -48,7 +48,12 @@ public enum ApplicationError {
     NO_CONTACTS_FOUND(100034, CommonValidationConstant.NO_CONTACTS_FOUND),
     REQUEST_NOT_FOUND(100035, CommonValidationConstant.REQUEST_NOT_FOUND),
     EMAIL_NOT_SENT(100036, CommonValidationConstant.EMAIL_NOT_SENT),
-    REQUEST_ALREADY_SENT(100037, CommonValidationConstant.REQUEST_ALREADY_SENT);
+    REQUEST_ALREADY_SENT(100037, CommonValidationConstant.REQUEST_ALREADY_SENT),
+    ROLE_UPDATE_NOT_ALLOWED(100038, CommonValidationConstant.ROLE_UPDATE_NOT_ALLOWED),
+    EMAIL_IS_ALREADY_IN_USE(100039, CommonValidationConstant.EMAIL_IS_ALREADY_IN_USE),
+    APP_VERSION_IS_MANDATORY(100040, CommonValidationConstant.APP_VERSION_IS_MANDATORY),
+    PLATFORM_ID_IS_MANDATORY(100041, CommonValidationConstant.PLATFORM_ID_IS_MANDATORY),
+    INSTALLED_AT_IS_MANDATORY(100042, CommonValidationConstant.INSTALLED_AT_IS_MANDATORY);
     private final int code;
     private final String reason;
     ApplicationError(int code, String reason) {

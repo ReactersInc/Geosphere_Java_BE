@@ -1,11 +1,14 @@
 package com.tridev.geoSphere.services;
 
+import com.tridev.geoSphere.dto.location.UserLocationWithGeofenceStatus;
 import com.tridev.geoSphere.entities.mongo.UserLocation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -14,22 +17,23 @@ public class WebSocketService {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Async
-    public void broadcastUserLocation(UserLocation location) {
+    public void broadcastUserLocationWithStatus(UserLocation location, Map<Long, Boolean> geofenceStatusMap) {
         try {
             if (location == null || location.getUserId() == null) {
                 log.error("Cannot broadcast null location or location with null userId");
                 return;
             }
 
-            // Send to specific topic for this user
             String destination = "/topic/user/" + location.getUserId() + "/location";
-            log.debug("Broadcasting location to {}", destination);
+            log.debug("Broadcasting location with geofence status to {}", destination);
 
-            messagingTemplate.convertAndSend(destination, location);
+            UserLocationWithGeofenceStatus payload = new UserLocationWithGeofenceStatus(location, geofenceStatusMap);
+            messagingTemplate.convertAndSend(destination, payload);
         } catch (Exception e) {
-            log.error("Error broadcasting user location: {}", e.getMessage(), e);
+            log.error("Error broadcasting user location with geofence status: {}", e.getMessage(), e);
         }
     }
+
 
     @Async
     public void sendGeofenceNotification(Long userId, String eventType, String geofenceName, Long geofenceId) {

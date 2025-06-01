@@ -13,5 +13,8 @@ public class UserDetailsDTO {
     private String firstName;
     private String lastName;
     private String dateOfBirth;
+    private String photo;
+    private Boolean publicProfile;
+    private String phoneNumber;
     private  String role;
 }

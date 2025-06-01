@@ -41,6 +41,11 @@ public class CommonValidationConstant {
     public static final String REQUEST_NOT_FOUND = "Request not found";
     public static final String EMAIL_NOT_SENT = "Unable to send email";
     public static final String REQUEST_ALREADY_SENT = "Request already sent";
+    public static final String ROLE_UPDATE_NOT_ALLOWED = "Role update is not allowed.";
+    public static final String EMAIL_IS_ALREADY_IN_USE = "Email is already in use by another user.";
+    public static final String APP_VERSION_IS_MANDATORY = "App version is mandatory";
+    public static final String PLATFORM_ID_IS_MANDATORY = "Platform id is mandatory";
+    public static final String INSTALLED_AT_IS_MANDATORY = "Installed at is mandatory";
 
     private CommonValidationConstant() {
     }

@@ -1,6 +1,7 @@
 package com.tridev.geoSphere.service;
 
 import com.tridev.geoSphere.entities.sql.UserEntity;
+import com.tridev.geoSphere.enums.Status;
 import com.tridev.geoSphere.repositories.sql.UserRepo;
 import com.tridev.geoSphere.services.NotificationService;
 import org.junit.jupiter.api.Test;
@@ -46,8 +47,8 @@ class NotificationServiceTest {
         user.setEmail("user@example.com");
         user.setFirstName("User");
 
-        when(userRepository.findById(creatorId)).thenReturn(Optional.of(creator));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findByIdAndStatus(creatorId,Status.ACTIVE.getValue())).thenReturn(Optional.of(creator));
+        when(userRepository.findByIdAndStatus(userId, Status.ACTIVE.getValue())).thenReturn(Optional.of(user));
 
         // Act
         notificationService.sendGeofenceExitNotification(creatorId, userId, geofenceId, geofenceName);
@@ -74,8 +75,8 @@ class NotificationServiceTest {
         user.setEmail("user@example.com");
         user.setFirstName("User");
 
-        when(userRepository.findById(creatorId)).thenReturn(Optional.of(creator));
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.findByIdAndStatus(creatorId,Status.ACTIVE.getValue())).thenReturn(Optional.of(creator));
+        when(userRepository.findByIdAndStatus(userId,Status.ACTIVE.getValue())).thenReturn(Optional.of(user));
 
         // Act
         notificationService.sendGeofenceEntryNotification(creatorId, userId, geofenceId, geofenceName);

@@ -1,6 +1,7 @@
 package com.tridev.geoSphere.services;
 
 import com.tridev.geoSphere.entities.sql.UserEntity;
+import com.tridev.geoSphere.enums.Status;
 import com.tridev.geoSphere.repositories.sql.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +21,9 @@ public class NotificationService {
 
     public void sendGeofenceExitNotification(Long creatorId, Long userId, Long geofenceId, String geofenceName) {
         // Get user details
-        UserEntity creator = userRepository.findById(creatorId)
+        UserEntity creator = userRepository.findByIdAndStatus(creatorId, Status.ACTIVE.getValue())
                 .orElseThrow(() -> new RuntimeException("Creator not found"));
-        UserEntity user = userRepository.findById(userId)
+        UserEntity user = userRepository.findByIdAndStatus(userId, Status.ACTIVE.getValue())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Send email notification
@@ -45,9 +46,9 @@ public class NotificationService {
 
     public void sendGeofenceEntryNotification(Long creatorId, Long userId, Long geofenceId, String geofenceName) {
         // Similar implementation as above for entry notifications
-        UserEntity creator = userRepository.findById(creatorId)
+        UserEntity creator = userRepository.findByIdAndStatus(creatorId, Status.ACTIVE.getValue())
                 .orElseThrow(() -> new RuntimeException("Creator not found"));
-        UserEntity user = userRepository.findById(userId)
+        UserEntity user = userRepository.findByIdAndStatus(userId, Status.ACTIVE.getValue())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         SimpleMailMessage message = new SimpleMailMessage();
