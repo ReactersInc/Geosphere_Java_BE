@@ -57,7 +57,9 @@ public enum ApplicationError {
     HARDWARE_NOT_FOUND(100043, CommonValidationConstant.HARDWARE_NOT_FOUND),
     HARDWARE_ALREADY_ASSIGNED(100044, CommonValidationConstant.HARDWARE_ALREADY_ASSIGNED),
     HARDWARE_ALREADY_EXISTS(100045, CommonValidationConstant.HARDWARE_ALREADY_EXISTS),
-    INVALID_HARDWARE_ID(100046, CommonValidationConstant.INVALID_HARDWARE_ID);
+    INVALID_HARDWARE_ID(100046, CommonValidationConstant.INVALID_HARDWARE_ID),
+    INVALID_LAT_LONG(100047, CommonValidationConstant.INVALID_LAT_LONG),
+    INVALID_HARDWARE(100048, CommonValidationConstant.INVALID_HARDWARE);
     private final int code;
     private final String reason;
     ApplicationError(int code, String reason) {

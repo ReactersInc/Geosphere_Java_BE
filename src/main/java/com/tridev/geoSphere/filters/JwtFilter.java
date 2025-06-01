@@ -40,7 +40,8 @@ public class JwtFilter extends OncePerRequestFilter {
             "/swagger-ui.html",
             "/error",
             "/ws",
-            "/ws/**"
+            "/ws/**",
+            "/hard-location"
     );
 
     private final UserServiceDetailsImpl userServiceDetails;
