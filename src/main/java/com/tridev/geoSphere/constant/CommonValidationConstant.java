@@ -46,6 +46,10 @@ public class CommonValidationConstant {
     public static final String APP_VERSION_IS_MANDATORY = "App version is mandatory";
     public static final String PLATFORM_ID_IS_MANDATORY = "Platform id is mandatory";
     public static final String INSTALLED_AT_IS_MANDATORY = "Installed at is mandatory";
+    public static final String HARDWARE_NOT_FOUND = "Hardware Not Found";
+    public static final String HARDWARE_ALREADY_ASSIGNED = "This hardware is already assigned to the user.";
+    public static final String HARDWARE_ALREADY_EXISTS ="Hardware with this MAC address already exists." ;
+    public static final String INVALID_HARDWARE_ID = "Invalid hardware ID";
 
     private CommonValidationConstant() {
     }
