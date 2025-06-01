@@ -21,10 +21,7 @@ import com.tridev.geoSphere.mappers.GeofenceRequestMapper;
 import com.tridev.geoSphere.mappers.GeofenceRequestResponseMapper;
 import com.tridev.geoSphere.mappers.UserGeofenceMapper;
 import com.tridev.geoSphere.repositories.mongo.UserLocationRepository;
-import com.tridev.geoSphere.repositories.sql.GeofenceRepository;
-import com.tridev.geoSphere.repositories.sql.GeofenceRequestRepository;
-import com.tridev.geoSphere.repositories.sql.UserGeofenceRepository;
-import com.tridev.geoSphere.repositories.sql.UserRepo;
+import com.tridev.geoSphere.repositories.sql.*;
 import com.tridev.geoSphere.response.BaseResponse;
 import com.tridev.geoSphere.utils.GeosphereServiceUtility;
 import com.tridev.geoSphere.utils.JwtUtil;
@@ -79,6 +76,9 @@ public class UserGeofenceService {
 
     @Autowired
     private GeofenceRequestResponseMapper geofenceRequestResponseMapper;
+
+    @Autowired
+    private UserContactsRepository userContactsRepository;
 
 
 

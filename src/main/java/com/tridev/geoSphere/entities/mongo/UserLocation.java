@@ -33,4 +33,6 @@ public class UserLocation {
     private Double heading; // direction in degrees
 
     private String deviceInfo;
+
+    private  boolean isInside;
 }
