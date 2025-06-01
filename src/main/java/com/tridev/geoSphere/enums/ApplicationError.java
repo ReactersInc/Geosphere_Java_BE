@@ -53,7 +53,11 @@ public enum ApplicationError {
     EMAIL_IS_ALREADY_IN_USE(100039, CommonValidationConstant.EMAIL_IS_ALREADY_IN_USE),
     APP_VERSION_IS_MANDATORY(100040, CommonValidationConstant.APP_VERSION_IS_MANDATORY),
     PLATFORM_ID_IS_MANDATORY(100041, CommonValidationConstant.PLATFORM_ID_IS_MANDATORY),
-    INSTALLED_AT_IS_MANDATORY(100042, CommonValidationConstant.INSTALLED_AT_IS_MANDATORY);
+    INSTALLED_AT_IS_MANDATORY(100042, CommonValidationConstant.INSTALLED_AT_IS_MANDATORY),
+    HARDWARE_NOT_FOUND(100043, CommonValidationConstant.HARDWARE_NOT_FOUND),
+    HARDWARE_ALREADY_ASSIGNED(100044, CommonValidationConstant.HARDWARE_ALREADY_ASSIGNED),
+    HARDWARE_ALREADY_EXISTS(100045, CommonValidationConstant.HARDWARE_ALREADY_EXISTS),
+    INVALID_HARDWARE_ID(100046, CommonValidationConstant.INVALID_HARDWARE_ID);
     private final int code;
     private final String reason;
     ApplicationError(int code, String reason) {
