@@ -1,19 +1,18 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@5.1.1 #Added the Slack Orb
+  slack: circleci/slack@5.1.1
 
 executors:
   deploy-executor:
     docker:
-      - image: cimg/base:stable # CircleCI base image for jobs
-    working_directory: ~/project # Set this to the location of your code repository
+      - image: cimg/base:stable
+    working_directory: ~/project
 
 jobs:
-  deploy_geosphere_backend:
+  deploy_geosphere_java_backend:
     executor: deploy-executor
     steps:
-      # Notify Slack of job success
       - slack/notify:
           event: always
           channel: "#circleci-deployment-query"
@@ -22,38 +21,33 @@ jobs:
               "blocks": [
                 {
                   "type": "header",
-                  "text": { "type": "plain_text", "text": "🚀 Deployment Triggered!" }
+                  "text": { "type": "plain_text", "text": "🚀 Java Backend Deployment Triggered!" }
                 },
                 {
                   "type": "section",
-                  "text": { "type": "mrkdwn", "text": "*Geosphere Backend* deployment has *started*. 🛠️" }
+                  "text": { "type": "mrkdwn", "text": "*Java Backend* deployment has *started*." }
                 }
               ]
             }
-      # Step 1: Checkout the code
+
       - checkout
 
-      # Step 2: Create .ssh directory
       - run:
           name: Create .ssh Directory
           command: mkdir -p ~/.ssh
 
-      # Step 3: Add SSH Keys
       - add_ssh_keys:
           fingerprints:
             - $SSH_KEY_FINGERPRINT
 
-      # Step 4: Add Oracle Server to known_hosts
       - run:
-          name: Add AWS Server to Known Hosts
+          name: Add EC2 Server to Known Hosts
           command: ssh-keyscan -H $AWS_SERVER_IP >> ~/.ssh/known_hosts
 
-      # Step 5: Execute Octorewards Deployment Script
       - run:
-          name: Execute Octorewards Deployment Script
-          command: ssh -vvv -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP "cd /GeoSphere_Backend && sudo sh deploy.sh"
+          name: Execute Deployment Script on Java EC2
+          command: ssh -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP "cd /GeoSphere_Java_BE && sudo sh deploy_fast.sh"
 
-      # Notify Slack of job success
       - slack/notify:
           event: pass
           channel: "#circleci-deployment-query"
@@ -62,15 +56,15 @@ jobs:
               "blocks": [
                 {
                   "type": "header",
-                  "text": { "type": "plain_text", "text": "✅ Deployment Success" }
+                  "text": { "type": "plain_text", "text": "✅ Java Deployment Successful" }
                 },
                 {
                   "type": "section",
-                  "text": { "type": "mrkdwn", "text": "*Geosphere Backend* has been deployed successfully! 🎉" }
+                  "text": { "type": "mrkdwn", "text": "*Java Backend* has been deployed successfully! 🎉" }
                 }
               ]
             }
-      # Notify Slack of job failure
+
       - slack/notify:
           event: fail
           channel: "#circleci-deployment-query"
@@ -79,20 +73,20 @@ jobs:
                "blocks": [
                  {
                    "type": "header",
-                   "text": { "type": "plain_text", "text": "❌ Deployment Failed" }
+                   "text": { "type": "plain_text", "text": "❌ Java Deployment Failed" }
                  },
                  {
                    "type": "section",
-                   "text": { "type": "mrkdwn", "text": "*Geosphere Backend* deployment failed! 🚨 Please check the CircleCI logs." }
+                   "text": { "type": "mrkdwn", "text": "*Java Backend* deployment failed! 🚨 Please check the CircleCI logs." }
                  }
                ]
              }
+
 workflows:
   version: 2
-  deploy_and_notify:
+  deploy_java_backend:
     jobs:
-      # The deploy job will be triggered for respective repository based on the branch name
-      - deploy_geosphere_backend:
+      - deploy_geosphere_java_backend:
           filters:
             branches:
               only:

@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -92,22 +93,24 @@ public class LocationTrackingService {
 
             UserLocation savedLocation = userLocationRepository.save(newLocation);
 
-            // Check geofence boundaries
-            geoFenceLocationService.checkGeofenceStatus(userId, request.getLatitude(), request.getLongitude());
 
-            webSocketService.broadcastUserLocation(savedLocation);
+            // Check geofence boundaries
+        Map<Long, Boolean> geofenceStatuses = checkGeofenceStatus(userId, request.getLatitude(), request.getLongitude());
+
+            webSocketService.broadcastUserLocationWithStatus(savedLocation, geofenceStatuses);
 
             return GeosphereServiceUtility.getBaseResponse(savedLocation);
 
     }
 
-    public void checkGeofenceStatus(Long userId, double latitude, double longitude) throws BadRequestException {
-        // Get all geofences this user is part of
+    public Map<Long, Boolean> checkGeofenceStatus(Long userId, double latitude, double longitude) throws BadRequestException {
         List<UserGeofenceEntity> userGeofences = userGeofenceRepository.findByUserId(userId);
+        Point userPoint = geometryFactory.createPoint(new Coordinate(latitude, longitude));
 
-        Point userPoint = geometryFactory.createPoint(new Coordinate(latitude,longitude ));
-        userGeofences.parallelStream().forEach(userGeofence->{
-            GeofenceEntity geofence = null;
+        Map<Long, Boolean> geofenceStatusMap = new HashMap<>();
+
+        userGeofences.parallelStream().forEach(userGeofence -> {
+            GeofenceEntity geofence;
             try {
                 geofence = geofenceRepository.findById(userGeofence.getGeofenceId())
                         .orElseThrow(() -> new BadRequestException(CommonValidationConstant.GEOFENCE_NOT_FOUND));
@@ -116,29 +119,26 @@ public class LocationTrackingService {
             }
 
             boolean isInside = isPointInGeofence(userPoint, geofence.getCoordinates());
+            geofenceStatusMap.put(geofence.getId(), isInside);
 
-            // If user was inside but now outside, update status and notify
             if (userGeofence.getIsCurrentlyInside() && !isInside) {
                 userGeofence.setIsCurrentlyInside(false);
                 userGeofence.setLastExitedAt(System.currentTimeMillis());
                 userGeofenceRepository.save(userGeofence);
-
-                // Send notification to geofence creator
                 notificationService.sendGeofenceExitNotification(
                         geofence.getCreatedBy(), userId, geofence.getId(), geofence.getName());
-            }
-            // If user was outside but now inside, update status
-            else if (!userGeofence.getIsCurrentlyInside() && isInside) {
+            } else if (!userGeofence.getIsCurrentlyInside() && isInside) {
                 userGeofence.setIsCurrentlyInside(true);
                 userGeofence.setLastEnteredAt(System.currentTimeMillis());
                 userGeofenceRepository.save(userGeofence);
-
-                // Optionally notify about re-entry
                 notificationService.sendGeofenceEntryNotification(
                         geofence.getCreatedBy(), userId, geofence.getId(), geofence.getName());
             }
         });
+
+        return geofenceStatusMap;
     }
+
 
     private boolean isPointInGeofence(Point point, String geofenceCoordinates) {
         try {

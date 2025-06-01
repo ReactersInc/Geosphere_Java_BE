@@ -24,10 +24,6 @@ public class GeofenceController {
     @Autowired
     private UserGeofenceService userGeofenceService;
 
-
-
-
-
     @PostMapping
     public BaseResponse createGeofence(@RequestBody GeofenceRequest request) throws Exception  {
 
