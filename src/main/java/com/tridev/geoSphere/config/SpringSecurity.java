@@ -39,6 +39,7 @@ public class SpringSecurity {
             "/swagger-ui.html",
             "/error",
             "/ws/**",
+            "/hard-location",
     };
 
     @Bean
