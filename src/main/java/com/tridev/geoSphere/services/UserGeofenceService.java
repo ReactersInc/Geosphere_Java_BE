@@ -7,10 +7,7 @@ import com.tridev.geoSphere.dto.UserGeofenceDTO.UserGeofeceRequestDTO;
 import com.tridev.geoSphere.dto.UserGeofenceDTO.UserGeofeceResponseDTO;
 import com.tridev.geoSphere.dto.common.PaginatedResponse;
 import com.tridev.geoSphere.entities.mongo.UserLocation;
-import com.tridev.geoSphere.entities.sql.GeofenceEntity;
-import com.tridev.geoSphere.entities.sql.GeofenceRequestEntity;
-import com.tridev.geoSphere.entities.sql.UserEntity;
-import com.tridev.geoSphere.entities.sql.UserGeofenceEntity;
+import com.tridev.geoSphere.entities.sql.*;
 import com.tridev.geoSphere.enums.InvitationStatus;
 import com.tridev.geoSphere.enums.NotificationStatus;
 import com.tridev.geoSphere.enums.ResponseStatus;
@@ -34,6 +31,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -281,7 +279,16 @@ public class UserGeofenceService {
 
                 requestEntity.setStatus(Status.ACCEPTED.getValue());
                 geofenceRequestRepository.save(requestEntity);
+                GeofenceEntity geofenceEntity = geofenceRepository.findByIdAndStatus(requestEntity.getGeofenceId(), Status.ACTIVE.getValue())
+                        .orElseThrow(() -> new BadRequestException(CommonValidationConstant.GEOFENCE_NOT_FOUND));
 
+                UserContactsEntity userContactsEntity = new UserContactsEntity();
+                userContactsEntity.setUserId(geofenceEntity.getCreatedBy());
+                userContactsEntity.setContactUserId(userId);
+                userContactsEntity.setStatus(Status.ACTIVE.getValue());
+                userContactsEntity.setCreatedBy(userId);
+                userContactsEntity.setCreatedAt(LocalDateTime.now());
+                userContactsRepository.save(userContactsEntity);
                 return GeosphereServiceUtility.getBaseResponseWithoutData();
             } else {
                 throw new BadRequestException(CommonValidationConstant.REQUEST_NOT_FOUND);
