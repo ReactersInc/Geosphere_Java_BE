@@ -7,10 +7,9 @@ import com.tridev.geoSphere.dto.UserGeofenceDTO.UserGeofeceRequestDTO;
 import com.tridev.geoSphere.dto.UserGeofenceDTO.UserGeofeceResponseDTO;
 import com.tridev.geoSphere.dto.common.PaginatedResponse;
 import com.tridev.geoSphere.entities.mongo.UserLocation;
-import com.tridev.geoSphere.entities.sql.GeofenceEntity;
-import com.tridev.geoSphere.entities.sql.GeofenceRequestEntity;
-import com.tridev.geoSphere.entities.sql.UserEntity;
-import com.tridev.geoSphere.entities.sql.UserGeofenceEntity;
+import com.tridev.geoSphere.entities.sql.*;
+import com.tridev.geoSphere.enums.*;
+import com.tridev.geoSphere.entities.sql.*;
 import com.tridev.geoSphere.enums.InvitationStatus;
 import com.tridev.geoSphere.enums.NotificationStatus;
 import com.tridev.geoSphere.enums.ResponseStatus;
@@ -34,6 +33,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -80,6 +80,11 @@ public class UserGeofenceService {
     @Autowired
     private UserContactsRepository userContactsRepository;
 
+    @Autowired
+    private FcmTokenService fcmTokenService;
+
+    @Autowired FCMTokenRepository fcmTokenRepository;
+
 
 
 
@@ -95,8 +100,13 @@ public class UserGeofenceService {
             if(byUserIdAndGeofenceIdAndStatus.isPresent()){
                 throw new BadRequestException(CommonValidationConstant.PERSON_ALREADY_EXISTS);
             }
+            Optional<FCMTokenEntity> byUserId = fcmTokenRepository.findByUserId(user.getId());
+            if(byUserId.isPresent()){
+                FCMTokenEntity fcmTokenEntity = byUserId.get();
 
-//            sendpushNotification(userGeofeceRequestDTO); to the user
+                fcmTokenService.sendNotification(fcmTokenEntity.getToken(), "Geofence Invitation", "You have been invited to join the geofence: " + userGeofeceRequestDTO.getGeofenceId() + ". Please accept the invitation to join.", String.valueOf(NotificationType.INVITATION));
+
+            }
         }
 
         // Check if the user is already in the geofence
@@ -136,6 +146,14 @@ public class UserGeofenceService {
             entity.setStatus(Status.PENDING.getValue());
 
             entity.setNotificationStatus(NotificationStatus.PENDING);
+
+
+
+
+
+
+
+
 
             Boolean email = emailService.sendEmail(userGeofeceRequestDTO.getEmail(),
                     "Invitation to join geofence",
@@ -252,6 +270,7 @@ public class UserGeofenceService {
     }
 
 
+    @Transactional(rollbackFor = Exception.class )
     public BaseResponse acceptGeofenceRequest(Long requestId) throws Exception {
         try {
             Long userId = jwtUtil.getUserIdFromToken();
@@ -281,7 +300,16 @@ public class UserGeofenceService {
 
                 requestEntity.setStatus(Status.ACCEPTED.getValue());
                 geofenceRequestRepository.save(requestEntity);
+                GeofenceEntity geofenceEntity = geofenceRepository.findByIdAndStatus(requestEntity.getGeofenceId(), Status.ACTIVE.getValue())
+                        .orElseThrow(() -> new BadRequestException(CommonValidationConstant.GEOFENCE_NOT_FOUND));
 
+                UserContactsEntity userContactsEntity = new UserContactsEntity();
+                userContactsEntity.setUserId(geofenceEntity.getCreatedBy());
+                userContactsEntity.setContactUserId(userId);
+                userContactsEntity.setStatus(Status.ACTIVE.getValue());
+                userContactsEntity.setCreatedBy(userId);
+                userContactsEntity.setCreatedAt(LocalDateTime.now());
+                userContactsRepository.save(userContactsEntity);
                 return GeosphereServiceUtility.getBaseResponseWithoutData();
             } else {
                 throw new BadRequestException(CommonValidationConstant.REQUEST_NOT_FOUND);
@@ -294,7 +322,8 @@ public class UserGeofenceService {
     }
 
 
-    public BaseResponse rejectGeofenceRequest(Long requestId) throws Exception {
+    @Transactional
+   public BaseResponse rejectGeofenceRequest(Long requestId) throws Exception {
         try {
             Long userId = jwtUtil.getUserIdFromToken();
 

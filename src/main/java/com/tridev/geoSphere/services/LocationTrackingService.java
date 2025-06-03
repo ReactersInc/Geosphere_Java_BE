@@ -109,7 +109,7 @@ public class LocationTrackingService {
 
         Map<Long, Boolean> geofenceStatusMap = new HashMap<>();
 
-        userGeofences.parallelStream().forEach(userGeofence -> {
+        userGeofences.forEach(userGeofence -> {
             GeofenceEntity geofence;
             try {
                 geofence = geofenceRepository.findById(userGeofence.getGeofenceId())
@@ -125,14 +125,22 @@ public class LocationTrackingService {
                 userGeofence.setIsCurrentlyInside(false);
                 userGeofence.setLastExitedAt(System.currentTimeMillis());
                 userGeofenceRepository.save(userGeofence);
-                notificationService.sendGeofenceExitNotification(
-                        geofence.getCreatedBy(), userId, geofence.getId(), geofence.getName());
+                try {
+                    notificationService.sendGeofenceExitNotification(
+                            geofence.getCreatedBy(), userId, geofence.getId(), geofence.getName());
+                } catch (BadRequestException e) {
+                    throw new RuntimeException(e);
+                }
             } else if (!userGeofence.getIsCurrentlyInside() && isInside) {
                 userGeofence.setIsCurrentlyInside(true);
                 userGeofence.setLastEnteredAt(System.currentTimeMillis());
                 userGeofenceRepository.save(userGeofence);
-                notificationService.sendGeofenceEntryNotification(
-                        geofence.getCreatedBy(), userId, geofence.getId(), geofence.getName());
+                try {
+                    notificationService.sendGeofenceEntryNotification(
+                            geofence.getCreatedBy(), userId, geofence.getId(), geofence.getName());
+                } catch (BadRequestException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
