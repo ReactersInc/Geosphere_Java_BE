@@ -22,12 +22,8 @@ import java.util.Optional;
 public class NotificationService {
     private final JavaMailSender mailSender;
     private final UserRepo userRepository;
-
-    @Autowired
-    private FCMTokenRepository fcmTokenRepository;
-
-    @Autowired
-    private FcmTokenService fcmTokenService;
+    private final FCMTokenRepository fcmTokenRepository;   // make final
+    private final FcmTokenService fcmTokenService;
 
     // In a real application, you would use Firebase Cloud Messaging,
     // WebSockets, or another push notification service
