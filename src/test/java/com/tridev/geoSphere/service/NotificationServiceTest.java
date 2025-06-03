@@ -2,6 +2,7 @@ package com.tridev.geoSphere.service;
 
 import com.tridev.geoSphere.entities.sql.UserEntity;
 import com.tridev.geoSphere.enums.Status;
+import com.tridev.geoSphere.exceptions.BadRequestException;
 import com.tridev.geoSphere.repositories.sql.UserRepo;
 import com.tridev.geoSphere.services.NotificationService;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ class NotificationServiceTest {
     private NotificationService notificationService;
 
     @Test
-    void sendGeofenceExitNotification_shouldSendEmail() {
+    void sendGeofenceExitNotification_shouldSendEmail() throws BadRequestException {
         // Arrange
         Long creatorId = 1L;
         Long userId = 2L;
@@ -58,7 +59,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    void sendGeofenceEntryNotification_shouldSendEmail() {
+    void sendGeofenceEntryNotification_shouldSendEmail() throws BadRequestException {
         // Arrange
         Long creatorId = 1L;
         Long userId = 2L;

@@ -9,6 +9,8 @@ public interface FCMTokenRepository extends JpaRepository<FCMTokenEntity, Long> 
 
     Optional<FCMTokenEntity> findByUserIdAndDeviceId(Long userId, String deviceId);
 
+    Optional<FCMTokenEntity> findByUserId(Long userId);
+
     boolean existsByUserId(Long userId);
 
     Optional<FCMTokenEntity> findByToken(String token);
