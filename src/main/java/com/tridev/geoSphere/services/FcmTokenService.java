@@ -103,7 +103,7 @@ public class FcmTokenService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
     public BaseResponse sendNotification(String token, String title, String body, String notificationType) throws BadRequestException {
         if (token == null || token.trim().isEmpty()) {
-            throw new BadRequestException("FCM registration token is missing or empty");
+            throw new BadRequestException(CommonValidationConstant.INVALID_FCM_TOKEN);
         }
 
         Long userId = jwtUtil.getUserIdFromToken();
