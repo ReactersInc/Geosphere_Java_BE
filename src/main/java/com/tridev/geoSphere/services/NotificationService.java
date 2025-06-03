@@ -17,13 +17,17 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class NotificationService {
-    private final JavaMailSender mailSender;
-    private final UserRepo userRepository;
-    private final FCMTokenRepository fcmTokenRepository;   // make final
-    private final FcmTokenService fcmTokenService;
+    @Autowired
+    private  JavaMailSender mailSender;
+    @Autowired
+    private  UserRepo userRepository;
+    @Autowired
+    private FCMTokenRepository fcmTokenRepository;
+    // make final
+    @Autowired
+    private FcmTokenService fcmTokenService;
 
     // In a real application, you would use Firebase Cloud Messaging,
     // WebSockets, or another push notification service
