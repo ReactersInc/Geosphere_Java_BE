@@ -107,57 +107,65 @@ public class FcmTokenService {
         }
 
         Long userId = jwtUtil.getUserIdFromToken();
-        Optional<FCMTokenEntity> fcmTokenOpt = fcmTokenRepository.findByToken(token);
-        if (fcmTokenOpt.isEmpty()) {
+        List<FCMTokenEntity> fcmTokens = fcmTokenRepository.findAllByToken(token);
+
+        if (fcmTokens == null || fcmTokens.isEmpty()) {
             throw new BadRequestException(CommonValidationConstant.INVALID_REQUEST);
         }
-        FCMTokenEntity fcmTokenEntity = fcmTokenOpt.get();
-        // Create notification entity with PENDING status
-        NotificationEntity notification = new NotificationEntity();
-        notification.setUserId(fcmTokenEntity.getUserId().intValue());
-        notification.setNotificationType(notificationType);
-        notification.setMessage(body);
-        notification.setFcmTokenId(fcmTokenEntity.getId());
-        notification.setTitle(title);
-        notification.setStatus(NotificationStatus.PENDING.getValue());
 
-        // Save initial notification with PENDING status
-        notification = notificationRepository.save(notification);
+        // Group by unique deviceId
+        Map<String, List<FCMTokenEntity>> deviceGroupedTokens = fcmTokens.stream()
+                .collect(Collectors.groupingBy(FCMTokenEntity::getDeviceId));
 
-        Message message = Message.builder()
-                .setToken(token)
-                .setNotification(Notification.builder()
-                        .setTitle(title)
-                        .setBody(body)
-                        .build()
-                )
-                .putData("deviceId", String.valueOf(fcmTokenEntity.getDeviceId()))
-                .build();
+        List<NotificationEntity> notificationsToSave = new ArrayList<>();
 
-        try {
-            String response = FirebaseMessaging.getInstance().send(message);
-            log.info("Successfully sent message: {}", response);
+        for (Map.Entry<String, List<FCMTokenEntity>> entry : deviceGroupedTokens.entrySet()) {
+            String deviceId = entry.getKey();
+            List<FCMTokenEntity> tokenGroup = entry.getValue();
+            FCMTokenEntity representativeToken = tokenGroup.get(0); // Pick one as representative
 
-            // Update notification status to SUCCESS and set sentAt and sentBy if needed
-            notification.setStatus(NotificationStatus.SUCCESS.getValue());
-            return GeosphereServiceUtility.getBaseResponse("Notification sent successfully");
-        } catch (FirebaseMessagingException fme) {
-            log.error("FirebaseMessagingException while sending notification: {}", fme.getMessage());
-            // Update notification status to FAILED
-            notification.setStatus(NotificationStatus.FAILED.getValue());
-            throw new BadRequestException(CommonValidationConstant.INVALID_FCM_TOKEN);
-        } catch (Exception e) {
-            log.error("Exception while sending notification", e);
+            Message message = Message.builder()
+                    .setToken(token)
+                    .setNotification(Notification.builder()
+                            .setTitle(title)
+                            .setBody(body)
+                            .build()
+                    )
+                    .putData("deviceId", deviceId)
+                    .build();
 
-            // Update notification status to FAILED
-            notification.setStatus(NotificationStatus.FAILED.getValue());
-            throw new BadRequestException(CommonValidationConstant.PUSH_NOTIFICATION_FAILED);
-        }finally {
-            notification.setSentAt(LocalDateTime.now());
-            notification.setCreatedAt(LocalDateTime.now());
-            notification.setSentBy(userId.intValue());
-            notificationRepository.save(notification);
+            boolean sent = false;
+            try {
+                String response = FirebaseMessaging.getInstance().send(message);
+                log.info("Successfully sent message for deviceId {}: {}", deviceId, response);
+                sent = true;
+            } catch (FirebaseMessagingException fme) {
+                log.error("FirebaseMessagingException for deviceId {}: {}", deviceId, fme.getMessage());
+            } catch (Exception e) {
+                log.error("Exception while sending message for deviceId {}", deviceId, e);
+            }
+
+            String status = sent ? NotificationStatus.SUCCESS.getValue() : NotificationStatus.FAILED.getValue();
+
+            // Save a notification record for each token mapped to this deviceId
+            for (FCMTokenEntity fcmTokenEntity : tokenGroup) {
+                NotificationEntity notification = new NotificationEntity();
+                notification.setUserId(fcmTokenEntity.getUserId().intValue());
+                notification.setNotificationType(notificationType);
+                notification.setMessage(body);
+                notification.setFcmTokenId(fcmTokenEntity.getId());
+                notification.setTitle(title);
+                notification.setStatus(status);
+                notification.setSentAt(LocalDateTime.now());
+                notification.setCreatedAt(LocalDateTime.now());
+                notification.setSentBy(userId.intValue());
+                notificationsToSave.add(notification);
+            }
         }
+
+        notificationRepository.saveAll(notificationsToSave);
+
+        return GeosphereServiceUtility.getBaseResponse("Notification processing complete. Check status for each device.");
     }
 
 

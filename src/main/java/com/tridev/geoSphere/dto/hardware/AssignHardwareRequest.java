@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AssignHardwareRequest {
-    private Long hardwareId;
+    private String hardwareMac;
     private Long userId;
     private Integer battery;
 }

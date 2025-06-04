@@ -45,36 +45,48 @@ public class UserHardwareService {
         Long requesterUserId = jwtUtil.getUserIdFromToken();
         log.info("Assigning hardware by userId: {}", requesterUserId);
 
-        if (request.getUserId() == null || request.getHardwareId() == null) {
+        // Validate userId in request
+        if (request.getUserId() == null || request.getHardwareMac() == null) {
             throw new BadRequestException(CommonValidationConstant.INVALID_REQUEST);
         }
 
-        Optional<UserEntity> user = userRepository.findByIdAndStatus(request.getUserId().longValue(), Status.ACTIVE.getValue());
-        if (user.isEmpty()) {
-            throw new BadRequestException(CommonValidationConstant.USER_NOT_FOUND);
-        }
-        UserEntity userEntity = user.get();
-        HardwareEntity hardware = hardwareRepository.findByIdAndStatusId(Long.valueOf(request.getHardwareId()), Status.ACTIVE.getValue());
-        if (hardware == null) {
+        // Fetch hardware by MAC address
+        Optional<HardwareEntity> hardwareEntityOpt = hardwareRepository.findByMacAddressAndStatusId(
+                request.getHardwareMac(), Status.ACTIVE.getValue());
+
+        if (hardwareEntityOpt.isEmpty()) {
             throw new BadRequestException(CommonValidationConstant.HARDWARE_NOT_FOUND);
         }
 
-        Long hardwareId = Long.valueOf(request.getHardwareId());
+        HardwareEntity hardware = hardwareEntityOpt.get();
+
+        // Validate user
+        Optional<UserEntity> userOpt = userRepository.findByIdAndStatus(
+                request.getUserId().longValue(), Status.ACTIVE.getValue());
+
+        if (userOpt.isEmpty()) {
+            throw new BadRequestException(CommonValidationConstant.USER_NOT_FOUND);
+        }
+
+        UserEntity user = userOpt.get();
+
+        // Check if hardware is already assigned to the user
         boolean alreadyAssigned = userHardwareRepository.existsByUser_IdAndHardware_IdAndStatusId(
-                request.getUserId().longValue(), hardwareId, Status.ACTIVE.getValue());
+                user.getId(), hardware.getId(), Status.ACTIVE.getValue());
 
         if (alreadyAssigned) {
             throw new BadRequestException(CommonValidationConstant.HARDWARE_ALREADY_ASSIGNED);
         }
         UserHardwareEntity userHardware = new UserHardwareEntity();
-        userHardware.setUser(userEntity);
+        userHardware.setUser(user);
         userHardware.setHardware(hardware);
         userHardware.setStatusId(Status.ACTIVE.getValue());
         userHardware.setBattery(request.getBattery());
         userHardware.setCreatedAt(LocalDateTime.now());
         userHardware.setUpdatedAt(LocalDateTime.now());
-        userHardware.setUpdatedBy(userEntity.getId());
-        userHardware.setCreatedBy(userEntity.getId());
+        userHardware.setCreatedBy(requesterUserId);
+        userHardware.setUpdatedBy(requesterUserId);
+
         userHardwareRepository.save(userHardware);
         return GeosphereServiceUtility.getBaseResponse("Hardware assigned to user successfully.");
     }
